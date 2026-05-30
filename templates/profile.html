@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+{% block title %}My Profile — PlacePredict AI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">My <span class="gradient-text">Profile</span></h2>
+      <p class="text-muted small mb-0">View and edit your personal information</p>
+    </div>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-light btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Dashboard
+    </a>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Left Card -->
+    <div class="col-lg-4">
+
+      <!-- Profile Card -->
+      <div class="card text-center py-4">
+        <div class="card-body">
+          <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+               style="width:90px;height:90px;
+                      background:linear-gradient(135deg,#16a34a,#22c55e);
+                      font-size:2.5rem;font-weight:700;color:#fff;">
+            {{ current_user.name[0].upper() }}
+          </div>
+          <h5 class="fw-bold mb-1">{{ current_user.name }}</h5>
+          <p class="text-muted small mb-1">{{ current_user.email }}</p>
+
+          {% if current_user.role == 'admin' %}
+            <p class="text-muted small mb-1">
+              <i class="bi bi-person-badge me-1"></i>
+              {{ current_user.designation or 'T&P Administrator' }}
+            </p>
+          {% else %}
+            <p class="text-muted small mb-1">
+              <i class="bi bi-building me-1"></i>
+              {{ current_user.branch or 'N/A' }}
+            </p>
+            <p class="text-muted small mb-1">
+              <i class="bi bi-calendar me-1"></i>
+              Batch {{ current_user.batch or 'N/A' }}
+            </p>
+          {% endif %}
+
+          <p class="text-muted small mb-3">
+            <i class="bi bi-telephone me-1"></i>
+            {{ current_user.phone or 'Not provided' }}
+          </p>
+          <span class="badge bg-success px-3 py-2">
+            {{ current_user.role.title() }}
+          </span>
+
+          {% if current_user.role == 'student' %}
+          <div class="d-grid mt-3">
+            <a href="{{ url_for('resume.upload') }}"
+               class="btn btn-primary btn-sm">
+              <i class="bi bi-upload me-1"></i>Upload New Resume
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Academic Info -->
+      {% if current_user.role == 'student' and resume %}
+      <div class="card mt-4">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3">
+            <i class="bi bi-mortarboard me-2 text-success"></i>Academic Info
+          </h6>
+          <div class="row g-2 text-center">
+            <div class="col-6">
+              <div class="p-2 rounded-3 bg-green-soft">
+                <div class="fw-bold" style="color:#16a34a;">
+                  {{ resume.cgpa or '—' }}
+                </div>
+                <div class="text-muted" style="font-size:0.7rem;">CGPA</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 rounded-3 bg-blue-soft">
+                <div class="fw-bold" style="color:#2563eb;">
+                  {{ resume.backlogs or 0 }}
+                </div>
+                <div class="text-muted" style="font-size:0.7rem;">Backlogs</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 rounded-3 bg-orange-soft">
+                <div class="fw-bold" style="color:#ea580c;">
+                  {{ resume.internship_count or 0 }}
+                </div>
+                <div class="text-muted" style="font-size:0.7rem;">Internships</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 rounded-3 bg-purple-soft">
+                <div class="fw-bold" style="color:#7c3aed;">
+                  {{ resume.project_count or 0 }}
+                </div>
+                <div class="text-muted" style="font-size:0.7rem;">Projects</div>
+              </div>
+            </div>
+          </div>
+
+          {% if resume.get_skills() %}
+          <h6 class="fw-bold mt-3 mb-2">
+            <i class="bi bi-tags me-1"></i>Skills
+          </h6>
+          <div class="d-flex flex-wrap gap-1">
+            {% for skill in resume.get_skills() %}
+            <span class="badge px-2 py-1"
+                  style="background:#e8f4fb;color:#0369a1;
+                         border:1px solid #b0cfe8;font-size:0.72rem;">
+              {{ skill }}
+            </span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Resume History -->
+      {% if current_user.role == 'student' %}
+      <div class="card mt-4">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-3">
+            <i class="bi bi-clock-history me-2 text-success"></i>
+            Resume History
+          </h6>
+          {% if resumes %}
+          <div class="d-flex flex-column gap-2">
+            {% for r in resumes %}
+            <div class="p-3 rounded-3 d-flex align-items-center gap-2"
+                 style="background:{% if r.is_active %}#f0fdf4{% else %}#f0f7ff{% endif %};
+                        border:1px solid
+                        {% if r.is_active %}#bbf7d0{% else %}#c7dff0{% endif %};">
+
+              <i class="bi bi-file-earmark-pdf flex-shrink-0"
+                 style="color:{% if r.is_active %}#16a34a{% else %}#0369a1{% endif %};
+                        font-size:1.2rem;"></i>
+
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="fw-semibold small text-truncate">
+                  {{ r.resume_name or 'Resume ' ~ loop.index }}
+                </div>
+                <div class="text-muted" style="font-size:0.7rem;">
+                  {{ r.uploaded_at.strftime('%d %b %Y, %I:%M %p')
+                     if r.uploaded_at else '—' }}
+                </div>
+              </div>
+
+              {% if r.is_active %}
+              <!-- Active resume — Active badge + Delete -->
+              <div class="d-flex align-items-center gap-1 flex-shrink-0">
+                <span class="badge"
+                      style="background:#dcfce7;color:#15803d;
+                             font-size:0.7rem;">
+                  Active ✅
+                </span>
+                <form method="POST"
+                      action="{{ url_for('resume.delete_resume', resume_id=r.id) }}"
+                      onsubmit="return confirm('Delete this active resume?')">
+                  <button type="submit"
+                          class="btn btn-sm btn-outline-danger"
+                          style="font-size:0.72rem;padding:2px 6px;">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+
+              {% else %}
+              <!-- Inactive resume — Use + Delete -->
+              <div class="d-flex gap-1 flex-shrink-0">
+                <form method="POST"
+                      action="{{ url_for('resume.set_active', resume_id=r.id) }}">
+                  <button type="submit"
+                          class="btn btn-sm btn-outline-light"
+                          style="font-size:0.72rem;white-space:nowrap;
+                                 padding:2px 8px;">
+                    <i class="bi bi-check2 me-1"></i>Use
+                  </button>
+                </form>
+                <form method="POST"
+                      action="{{ url_for('resume.delete_resume', resume_id=r.id) }}"
+                      onsubmit="return confirm('Delete this resume?')">
+                  <button type="submit"
+                          class="btn btn-sm btn-outline-danger"
+                          style="font-size:0.72rem;padding:2px 6px;">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+              {% endif %}
+
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-muted small mb-0">No resumes uploaded yet.</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+    <!-- End col-lg-4 -->
+
+    <!-- Right — Edit Form -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-4">
+            <i class="bi bi-pencil-square me-2 text-success"></i>Edit Profile
+          </h5>
+
+          <form method="POST" action="{{ url_for('main.profile') }}">
+            <div class="row g-3">
+
+              <div class="col-md-6">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="name" class="form-control"
+                       value="{{ current_user.name }}" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Phone Number</label>
+                <input type="text" name="phone" class="form-control"
+                       value="{{ current_user.phone or '' }}"
+                       placeholder="10-digit mobile number">
+              </div>
+
+              {% if current_user.role == 'admin' %}
+              <div class="col-md-6">
+                <label class="form-label">Designation</label>
+                <input type="text" name="designation" class="form-control"
+                       value="{{ current_user.designation or '' }}"
+                       placeholder="e.g. Professor, HOD, T&P Coordinator">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Department</label>
+                <select name="department" class="form-select">
+                  <option value="">Select Department</option>
+                  <option value="CSE" {{ 'selected' if current_user.department == 'CSE' else '' }}>Computer Science & Engineering</option>
+                  <option value="CSE-AI" {{ 'selected' if current_user.department == 'CSE-AI' else '' }}>CSE (AI)</option>
+                  <option value="ECE" {{ 'selected' if current_user.department == 'ECE' else '' }}>Electronics & Communication</option>
+                  <option value="EEE" {{ 'selected' if current_user.department == 'EEE' else '' }}>Electrical Engineering</option>
+                  <option value="ME" {{ 'selected' if current_user.department == 'ME' else '' }}>Mechanical Engineering</option>
+                  <option value="Civil" {{ 'selected' if current_user.department == 'Civil' else '' }}>Civil Engineering</option>
+                  <option value="T&P" {{ 'selected' if current_user.department == 'T&P' else '' }}>Training & Placement Cell</option>
+                  <option value="Administration" {{ 'selected' if current_user.department == 'Administration' else '' }}>Administration</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">College</label>
+                <input type="text" class="form-control"
+                       value="Motihari College of Engineering" readonly
+                       style="background:#f0f7ff;">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-control"
+                       value="Motihari, East Champaran, Bihar — 845401" readonly
+                       style="background:#f0f7ff;">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Employee ID</label>
+                <input type="text" name="employee_id" class="form-control"
+                       value="{{ current_user.employee_id or '' }}"
+                       placeholder="e.g. MCE/TP/2024/001">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Office Email</label>
+                <input type="text" class="form-control"
+                       value="{{ current_user.email }}" readonly
+                       style="background:#f0f7ff;">
+              </div>
+
+              {% else %}
+              <div class="col-md-6">
+                <label class="form-label">Branch</label>
+                <select name="branch" class="form-select">
+                  {% for b in ['CSE', 'CSE-AI', 'CSE-DS', 'EEE', 'ME', 'CE'] %}
+                  <option value="{{ b }}"
+                    {{ 'selected' if current_user.branch == b else '' }}>
+                    {{ b }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Batch Year</label>
+                <select name="batch" class="form-select">
+                  {% set batches = ['2022-26','2023-27','2024-28',
+                                    '2025-29','2026-30','2027-31'] %}
+                  {% for b in batches %}
+                  <option value="{{ b }}"
+                    {{ 'selected' if current_user.batch|string == b else '' }}>
+                    {{ b }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% endif %}
+
+            </div>
+
+            <!-- Password Change -->
+            <hr class="my-4" style="border-color:#d4e9f7;">
+            <h6 class="fw-bold mb-3">
+              <i class="bi bi-lock me-2 text-success"></i>Change Password
+              <span class="text-muted fw-normal small">(Optional)</span>
+            </h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">New Password</label>
+                <input type="password" name="new_password" class="form-control"
+                       placeholder="Leave blank to keep current">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" name="confirm_password" class="form-control"
+                       placeholder="Repeat new password">
+              </div>
+            </div>
+
+            <div class="d-flex gap-3 mt-4">
+              <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-check-circle me-2"></i>Save Changes
+              </button>
+              <a href="{{ url_for('main.dashboard') }}"
+                 class="btn btn-outline-light px-4">
+                Cancel
+              </a>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

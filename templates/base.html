@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PlacePredict AI — MCE T&P Cell{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+
+        body {
+            background: #eaf4fb;
+            color: #1a1a2e;
+        }
+
+        /* ===== NAVBAR ===== */
+        #mainNav {
+            background: #ffffff;
+            border-bottom: 3px solid #16a34a;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+            padding: 10px 0;
+        }
+
+        .brand-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-title span { color: #16a34a; }
+
+        .brand-sub {
+            font-size: 0.68rem;
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .navbar-nav .nav-link {
+            color: #374151 !important;
+            font-weight: 500;
+            font-size: 0.88rem;
+            padding: 6px 14px !important;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background: #f0fdf4;
+            color: #16a34a !important;
+        }
+
+        .nav-avatar {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .dropdown-menu {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            padding: 8px;
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        .dropdown-item:hover {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: #ffffff !important;
+            border: 1px solid #d4e9f7 !important;
+            border-radius: 14px !important;
+            box-shadow: 0 2px 12px rgba(14,120,190,0.07) !important;
+        }
+
+        .card-body { color: #1a1a2e; }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary, .btn-gradient {
+            background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+            border: none !important;
+            color: white !important;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover, .btn-gradient:hover {
+            background: linear-gradient(135deg, #15803d, #16a34a) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(22,163,74,0.3);
+        }
+
+        .btn-outline-light {
+            border: 1.5px solid #b0cfe8 !important;
+            color: #374151 !important;
+            background: transparent !important;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-outline-light:hover {
+            background: #e8f4fb !important;
+            border-color: #16a34a !important;
+            color: #16a34a !important;
+        }
+
+        .btn-outline-success {
+            border-color: #16a34a !important;
+            color: #16a34a !important;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-outline-success:hover {
+            background: #16a34a !important;
+            color: white !important;
+        }
+
+        /* ===== GRADIENT TEXT ===== */
+        .gradient-text {
+            background: linear-gradient(135deg, #0369a1, #16a34a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== TABLES ===== */
+        .table { color: #374151; }
+        .table-light { background: #f0f7ff !important; }
+        .table thead th {
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 0.78rem;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid #d4e9f7;
+        }
+        .table tbody tr:hover { background: #f0f7ff; }
+
+        /* ===== PROGRESS ===== */
+        .progress {
+            background: #d4e9f7;
+            border-radius: 10px;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            border-radius: 10px;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+        }
+        .alert-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+        .alert-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+        }
+        .alert-warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #d97706;
+        }
+
+        /* ===== BADGES ===== */
+        .badge { font-weight: 500; }
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb-item a {
+            color: #0369a1;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .breadcrumb-item a:hover { color: #16a34a; }
+        .breadcrumb-item.active { color: #6b7280; }
+
+        /* ===== FORM CONTROLS ===== */
+        .form-control, .form-select {
+            border: 1.5px solid #b0cfe8;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #1a1a2e;
+            background: #ffffff;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+            background: #ffffff;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        /* ===== STAT CARDS ===== */
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #d4e9f7;
+            border-radius: 14px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+        .stat-card:hover {
+            box-shadow: 0 4px 20px rgba(14,120,190,0.12);
+            transform: translateY(-2px);
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        /* ===== SOFT BACKGROUNDS ===== */
+        .bg-green-soft  { background: #f0fdf4 !important; color: #16a34a; }
+        .bg-blue-soft   { background: #eff6ff !important; color: #2563eb; }
+        .bg-orange-soft { background: #fff7ed !important; color: #ea580c; }
+        .bg-purple-soft { background: #faf5ff !important; color: #7c3aed; }
+        .bg-teal-soft   { background: #f0fdfa !important; color: #0d9488; }
+
+        /* ===== TEXT COLORS ===== */
+        .text-indigo { color: #4f46e5 !important; }
+        h1, h2, h3, h4, h5, h6 { color: #1a1a2e; font-weight: 700; }
+        .text-muted { color: #6b7280 !important; }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            background: linear-gradient(135deg, #e8f4fd, #f0fdf4);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            border: 1px solid #d4e9f7;
+        }
+
+        /* ===== SECTION DIVIDER ===== */
+        .section-divider {
+            border: none;
+            border-top: 2px solid #d4e9f7;
+            margin: 24px 0;
+        }
+
+        /* ===== FOOTER ===== */
+        .site-footer {
+            background: #1a2744;
+            color: #9ca3af;
+            padding: 30px 0;
+        }
+        .footer-brand {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .footer-brand span { color: #22c55e; }
+        .footer-sub, .footer-address {
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            margin-left: 16px;
+            font-size: 0.8rem;
+        }
+        .footer-links a:hover { color: #22c55e; }
+        .footer-copy { font-size: 0.75rem; color: #6b7280; }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #eaf4fb; }
+        ::-webkit-scrollbar-thumb {
+            background: #b0cfe8;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: #16a34a; }
+    </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('main.index') }}">
+            <div class="brand-icon">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <div>
+                <div class="brand-title">PlacePredict <span>AI</span></div>
+                <div class="brand-sub">AI-Placement Prediction and Skill Gap Analysis</div>
+            </div>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ms-auto align-items-center gap-1">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                                <i class="bi bi-speedometer2 me-1"></i>Admin Panel
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.dashboard') }}">
+                                <i class="bi bi-grid me-1"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('resume.upload') }}">
+                                <i class="bi bi-file-earmark-person me-1"></i>Resume
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('predict.run') }}">
+                                <i class="bi bi-bar-chart me-1"></i>Predict
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('recommend.index') }}">
+                                <i class="bi bi-lightbulb me-1"></i>Resources
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('chatbot.chatbot_page') }}">
+                                <i class="bi bi-robot me-1"></i>PlaceBot
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item dropdown ms-2">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                           href="#" data-bs-toggle="dropdown">
+                            <div class="nav-avatar">{{ current_user.name[0].upper() }}</div>
+                            <span style="color:#374151;font-weight:500;">
+                                {{ current_user.name.split()[0] }}
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('main.profile') }}">
+                                    <i class="bi bi-person me-2"></i>Profile
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="position-fixed top-0 end-0 p-3" style="z-index:9999; margin-top:70px;">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'info' }} alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'danger' else 'info-circle' }} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- MAIN CONTENT -->
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer mt-5">
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="footer-brand">PlacePredict <span>AI</span></div>
+                <p class="footer-sub mb-0">Motihari College of Engineering — Training & Placement Cell</p>
+                <p class="footer-address mb-0">Motihari, East Champaran, Bihar — 845401</p>
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Use</a>
+                    <a href="#">Contact T&P Cell</a>
+                </div>
+                <p class="footer-copy mt-2 mb-0">© 2026 MCE T&P Cell. Developed by CSE-AI Department.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

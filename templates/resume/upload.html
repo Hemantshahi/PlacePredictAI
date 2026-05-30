@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+{% block title %}Upload Resume — PlacePredict AI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">
+        Resume <span class="gradient-text">Analysis</span>
+      </h2>
+      <p class="text-muted small mb-0">
+        Upload your resume or fill profile manually
+      </p>
+    </div>
+    <a href="{{ url_for('main.dashboard') }}"
+       class="btn btn-outline-light btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Dashboard
+    </a>
+  </div>
+
+  <!-- Mode Toggle -->
+  <div class="mode-toggle-wrap mb-4">
+    <button class="mode-btn active" id="btnUpload"
+            onclick="setMode('upload')">
+      <i class="bi bi-upload me-2"></i>Upload Resume (PDF/DOC)
+    </button>
+    <button class="mode-btn" id="btnManual"
+            onclick="setMode('manual')">
+      <i class="bi bi-pencil-square me-2"></i>Fill Profile Manually
+    </button>
+  </div>
+
+  <!-- UPLOAD FORM -->
+  <div id="uploadSection">
+    <div class="card">
+      <div class="card-body p-4">
+        <h5 class="fw-bold mb-4">
+          <i class="bi bi-cloud-upload me-2 text-success"></i>
+          Upload Your Resume
+        </h5>
+        <form method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="mode" value="upload">
+
+          <!-- Drop Zone -->
+          <div class="upload-zone mb-4" id="uploadZone">
+            <i class="bi bi-file-earmark-pdf fs-1 mb-2"
+               style="color:#0369a1;"></i>
+            <h6 class="fw-semibold">Drag & drop your resume here</h6>
+            <p class="text-muted small">
+              or click to browse — PDF, DOC, DOCX (max 10MB)
+            </p>
+            <input type="file" name="resume_file" id="resumeFile"
+                   accept=".pdf,.doc,.docx" required class="d-none">
+            <button type="button"
+                    class="btn btn-outline-light btn-sm"
+                    onclick="document.getElementById('resumeFile').click()">
+              <i class="bi bi-folder2-open me-1"></i>Browse File
+            </button>
+            <div id="fileNameDisplay"
+                 class="mt-2 fw-bold"
+                 style="color:#16a34a;"></div>
+          </div>
+
+          <!-- Target Role — Branch ke hisaab se -->
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Target Job Role</label>
+              <select name="target_role" class="form-select"
+                      id="uploadTargetRole">
+
+                {% set branch = current_user.branch or 'CSE' %}
+
+                {% if branch in ['CSE', 'CSE-DS', 'IT'] %}
+                  <option selected>Software Engineer</option>
+                  <option>Data Analyst</option>
+                  <option>Data Scientist</option>
+                  <option>Web Developer</option>
+                  <option>DevOps Engineer</option>
+                  <option>Android Developer</option>
+
+                {% elif branch == 'CSE-AI' %}
+                  <option selected>Data Scientist</option>
+                  <option>Data Analyst</option>
+                  <option>Software Engineer</option>
+                  <option>Web Developer</option>
+                  <option>DevOps Engineer</option>
+
+                {% elif branch == 'ECE' %}
+                  <option selected>Embedded Systems Engineer</option>
+                  <option>VLSI Design Engineer</option>
+                  <option>IoT Engineer</option>
+                  <option>RF & Communication Engineer</option>
+                  <option>Software Engineer</option>
+
+                {% elif branch == 'EEE' %}
+                  <option selected>Electrical Engineer</option>
+                  <option>Power Systems Engineer</option>
+                  <option>Automation Engineer</option>
+                  <option>Control Systems Engineer</option>
+
+                {% elif branch in ['Civil', 'Civil-CA', 'CE'] %}
+                  <option selected>Civil Engineer</option>
+                  <option>Structural Engineer</option>
+                  <option>Site Engineer</option>
+                  <option>Transportation Engineer</option>
+                  <option>Environmental Engineer</option>
+
+                {% elif branch == 'ME' %}
+                  <option selected>Mechanical Engineer</option>
+                  <option>Design Engineer</option>
+                  <option>Production Engineer</option>
+                  <option>Thermal Engineer</option>
+                  <option>Automobile Engineer</option>
+
+                {% else %}
+                  <option selected>Software Engineer</option>
+                  <option>Data Analyst</option>
+                  <option>Data Scientist</option>
+                  <option>Web Developer</option>
+                {% endif %}
+
+              </select>
+              <p class="text-muted mt-1" style="font-size:0.75rem;">
+                <i class="bi bi-info-circle me-1"></i>
+                Roles shown based on your branch:
+                <strong>{{ current_user.branch or 'N/A' }}</strong>
+              </p>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary mt-4 px-4">
+            <i class="bi bi-cpu me-2"></i>Analyze Resume with AI
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANUAL FORM -->
+  <div id="manualSection" style="display:none;">
+    <div class="card">
+      <div class="card-body p-4">
+        <h5 class="fw-bold mb-4">
+          <i class="bi bi-person-vcard me-2 text-success"></i>
+          Academic Profile
+        </h5>
+        <form method="POST">
+          <input type="hidden" name="mode" value="manual">
+          <div class="row g-3">
+
+            <div class="col-md-4">
+              <label class="form-label">CGPA (out of 10)</label>
+              <input type="number" name="cgpa" class="form-control"
+                     step="0.01" min="0" max="10"
+                     placeholder="e.g. 7.8" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">10th Percentage</label>
+              <input type="number" name="tenth_percent"
+                     class="form-control" step="0.1"
+                     placeholder="e.g. 78.5" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">12th Percentage</label>
+              <input type="number" name="twelfth_percent"
+                     class="form-control" step="0.1"
+                     placeholder="e.g. 72.0" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Active Backlogs</label>
+              <input type="number" name="backlogs"
+                     class="form-control" min="0" value="0">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Internships Done</label>
+              <input type="number" name="internships"
+                     class="form-control" min="0" value="0">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Projects Built</label>
+              <input type="number" name="projects"
+                     class="form-control" min="0" value="0">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Certifications</label>
+              <input type="number" name="certifications"
+                     class="form-control" min="0" value="0">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Communication Skill (1-10)</label>
+              <input type="range" name="communication"
+                     class="form-range" min="1" max="10" value="5"
+                     oninput="this.nextElementSibling.textContent=this.value">
+              <span class="range-val">5</span>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Coding Skill (1-10)</label>
+              <input type="range" name="coding_skill"
+                     class="form-range" min="1" max="10" value="5"
+                     oninput="this.nextElementSibling.textContent=this.value">
+              <span class="range-val">5</span>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Extracurricular Activities</label>
+              <input type="number" name="extracurricular"
+                     class="form-control" min="0" value="0">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Aptitude Score (0-100)</label>
+              <input type="number" name="aptitude"
+                     class="form-control" min="0" max="100"
+                     placeholder="e.g. 65">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Technical Test Score (0-100)</label>
+              <input type="number" name="technical"
+                     class="form-control" min="0" max="100"
+                     placeholder="e.g. 70">
+            </div>
+
+            <!-- Target Role — Branch based -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Target Role</label>
+              <select name="target_role" class="form-select">
+
+                {% set branch = current_user.branch or 'CSE' %}
+
+                {% if branch in ['CSE', 'CSE-DS', 'IT'] %}
+                  <option selected>Software Engineer</option>
+                  <option>Data Analyst</option>
+                  <option>Data Scientist</option>
+                  <option>Web Developer</option>
+                  <option>DevOps Engineer</option>
+                  <option>Android Developer</option>
+
+                {% elif branch == 'CSE-AI' %}
+                  <option selected>Data Scientist</option>
+                  <option>Data Analyst</option>
+                  <option>Software Engineer</option>
+                  <option>Web Developer</option>
+                  <option>DevOps Engineer</option>
+
+                {% elif branch == 'ECE' %}
+                  <option selected>Embedded Systems Engineer</option>
+                  <option>VLSI Design Engineer</option>
+                  <option>IoT Engineer</option>
+                  <option>RF & Communication Engineer</option>
+                  <option>Software Engineer</option>
+
+                {% elif branch == 'EEE' %}
+                  <option selected>Electrical Engineer</option>
+                  <option>Power Systems Engineer</option>
+                  <option>Automation Engineer</option>
+                  <option>Control Systems Engineer</option>
+
+                {% elif branch in ['Civil', 'Civil-CA', 'CE'] %}
+                  <option selected>Civil Engineer</option>
+                  <option>Structural Engineer</option>
+                  <option>Site Engineer</option>
+                  <option>Transportation Engineer</option>
+                  <option>Environmental Engineer</option>
+
+                {% elif branch == 'ME' %}
+                  <option selected>Mechanical Engineer</option>
+                  <option>Design Engineer</option>
+                  <option>Production Engineer</option>
+                  <option>Thermal Engineer</option>
+                  <option>Automobile Engineer</option>
+
+                {% else %}
+                  <option selected>Software Engineer</option>
+                  <option>Data Analyst</option>
+                  <option>Data Scientist</option>
+                  <option>Web Developer</option>
+                {% endif %}
+
+              </select>
+              <p class="text-muted mt-1" style="font-size:0.75rem;">
+                <i class="bi bi-info-circle me-1"></i>
+                Branch: <strong>{{ current_user.branch or 'N/A' }}</strong>
+              </p>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">
+                Your Skills
+                <small class="text-muted">(comma separated)</small>
+              </label>
+              <textarea name="skills" class="form-control" rows="3"
+                placeholder="{% if branch in ['Civil', 'Civil-CA'] %}autocad, staad pro, rcc design, surveying...{% elif branch == 'ME' %}solidworks, catia, autocad, ansys...{% elif branch == 'EEE' %}matlab, plc programming, scada, power systems...{% elif branch == 'ECE' %}embedded c, arduino, verilog, matlab...{% else %}python, sql, machine learning, power bi...{% endif %}">
+              </textarea>
+            </div>
+
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-bar-chart me-2"></i>
+                Predict Placement Probability
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setMode(mode) {
+  document.getElementById('uploadSection').style.display =
+    mode === 'upload' ? 'block' : 'none';
+  document.getElementById('manualSection').style.display =
+    mode === 'manual' ? 'block' : 'none';
+  document.getElementById('btnUpload').classList.toggle('active',
+    mode === 'upload');
+  document.getElementById('btnManual').classList.toggle('active',
+    mode === 'manual');
+}
+
+document.getElementById('resumeFile').addEventListener('change',
+  function() {
+    const name = this.files[0]?.name || '';
+    document.getElementById('fileNameDisplay').textContent =
+      name ? '✅ ' + name : '';
+  }
+);
+
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => {
+  e.preventDefault();
+  zone.classList.add('dragover');
+});
+zone.addEventListener('dragleave', () =>
+  zone.classList.remove('dragover')
+);
+zone.addEventListener('drop', e => {
+  e.preventDefault();
+  zone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    document.getElementById('resumeFile').files =
+      e.dataTransfer.files;
+    document.getElementById('fileNameDisplay').textContent =
+      '✅ ' + file.name;
+  }
+});
+</script>
+{% endblock %}

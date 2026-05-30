@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}PlacePredict AI — Smart Placement System | MCE{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero-section">
+    <div class="hero-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    <div class="container py-5">
+        <div class="row align-items-center min-vh-80 py-5">
+            <div class="col-lg-6">
+                <div class="hero-badge mb-3">
+                    <span class="badge-dot"></span>
+                    MCE Training & Placement Cell — AI System
+                </div>
+                <h1 class="hero-title">
+                    Smart <span class="gradient-text">Placement</span><br>
+                    Prediction System
+                </h1>
+                <p class="hero-desc mt-3 mb-4">
+                    Predict your placement chances, score your resume with ATS analysis,
+                    identify skill gaps, and get personalized career guidance — all powered
+                    by Machine Learning & AI.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Get Started Free
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Student Login
+                    </a>
+                </div>
+                <div class="hero-stats mt-5 d-flex gap-4 flex-wrap">
+                    <div class="stat-pill"><span class="stat-num">93%</span><span class="stat-label">Model Accuracy</span></div>
+                    <div class="stat-pill"><span class="stat-num">15+</span><span class="stat-label">Companies Listed</span></div>
+                    <div class="stat-pill"><span class="stat-num">3</span><span class="stat-label">ML Models</span></div>
+                </div>
+            </div>
+            <div class="col-lg-6 mt-5 mt-lg-0 text-center">
+                <div class="hero-card-stack">
+                    <div class="hero-card card-1">
+                        <div class="hc-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                        <div>
+                            <div class="hc-title">Placement Probability</div>
+                            <div class="hc-score">87.4%</div>
+                        </div>
+                        <div class="hc-badge green">High Chance</div>
+                    </div>
+                    <div class="hero-card card-2">
+                        <div class="hc-icon orange"><i class="bi bi-file-earmark-check"></i></div>
+                        <div>
+                            <div class="hc-title">ATS Resume Score</div>
+                            <div class="hc-score">76/100</div>
+                        </div>
+                        <div class="hc-badge orange">Good</div>
+                    </div>
+                    <div class="hero-card card-3">
+                        <div class="hc-icon blue"><i class="bi bi-lightbulb"></i></div>
+                        <div>
+                            <div class="hc-title">Skill Gap Found</div>
+                            <div class="hc-score">4 Skills</div>
+                        </div>
+                        <div class="hc-badge blue">Learning Path Ready</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <div class="section-badge">Features</div>
+            <h2 class="section-title">Everything You Need to Get <span class="gradient-text">Placed</span></h2>
+            <p class="section-sub">Comprehensive placement preparation powered by AI</p>
+        </div>
+        <div class="row g-4">
+            {% set features = [
+                ('bi-file-earmark-person', 'ATS Resume Scoring', 'Get instant ATS score (0-100) with keyword analysis, formatting check & actionable improvement tips.', '#6366f1'),
+                ('bi-bar-chart-line', 'ML Placement Prediction', 'Random Forest + XGBoost + ANN ensemble gives accurate placement probability with model comparison.', '#22c55e'),
+                ('bi-puzzle', 'Skill Gap Analysis', 'Compare your skills vs job role requirements. Get prioritized missing skills with YouTube resources.', '#f59e0b'),
+                ('bi-building', 'Company Matching', 'Get matched with TCS, Infosys, Google, Mu Sigma and more based on your profile with % match score.', '#3b82f6'),
+                ('bi-robot', 'AI Career Chatbot', 'PlaceBot — your 24/7 AI career guide for resume tips, interview prep & company information.', '#ec4899'),
+                ('bi-speedometer2', 'Admin Analytics', 'T&P Cell dashboard with batch-wise analytics, ATS distribution, and placement trend charts.', '#8b5cf6'),
+            ] %}
+            {% for icon, title, desc, color in features %}
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: {{ color }}22; color: {{ color }}">
+                        <i class="bi {{ icon }}"></i>
+                    </div>
+                    <h5 class="feature-title mt-3">{{ title }}</h5>
+                    <p class="feature-desc">{{ desc }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <div class="section-badge">Process</div>
+            <h2 class="section-title">How It <span class="gradient-text">Works</span></h2>
+        </div>
+        <div class="row g-4 justify-content-center">
+            {% set steps = [
+                ('1', 'bi-person-plus', 'Register', 'Create your MCE student account in 30 seconds'),
+                ('2', 'bi-upload', 'Upload Resume', 'Upload PDF/DOC or fill your profile manually'),
+                ('3', 'bi-cpu', 'AI Analysis', 'Get ATS score, placement prediction & skill gaps'),
+                ('4', 'bi-trophy', 'Get Placed', 'Follow personalized roadmap to land your dream job'),
+            ] %}
+            {% for num, icon, title, desc in steps %}
+            <div class="col-sm-6 col-lg-3">
+                <div class="step-card text-center">
+                    <div class="step-num">{{ num }}</div>
+                    <div class="step-icon"><i class="bi {{ icon }}"></i></div>
+                    <h6 class="step-title">{{ title }}</h6>
+                    <p class="step-desc">{{ desc }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section py-5 my-4">
+    <div class="container">
+        <div class="cta-card text-center">
+            <h2 class="cta-title">Ready to Predict Your <span class="gradient-text">Placement?</span></h2>
+            <p class="cta-sub">Join hundreds of MCE students already using PlacePredict AI</p>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-5 mt-3">
+                <i class="bi bi-rocket-takeoff me-2"></i>Start for Free
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

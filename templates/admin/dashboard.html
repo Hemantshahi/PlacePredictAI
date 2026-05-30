@@ -1,0 +1,635 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — T&P Cell{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">
+        T&P Cell <span class="gradient-text">Admin Panel</span>
+      </h2>
+      <p class="text-muted small mb-0">
+        Motihari College of Engineering — Training & Placement Cell
+      </p>
+    </div>
+    <a href="{{ url_for('main.profile') }}" class="btn btn-outline-light btn-sm">
+      <i class="bi bi-person-gear me-1"></i>My Profile
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="bi bi-people"></i></div>
+        <div>
+          <div class="stat-value">{{ total_users }}</div>
+          <div class="stat-label">Registered Students</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+        <div>
+          <div class="stat-value">{{ placed_count }}</div>
+          <div class="stat-label">High Placement Score</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="bi bi-cpu"></i></div>
+        <div>
+          <div class="stat-value">{{ total_predictions }}</div>
+          <div class="stat-label">Total Predictions</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon orange"><i class="bi bi-bar-chart"></i></div>
+        <div>
+          <div class="stat-value">{{ avg_prob }}%</div>
+          <div class="stat-label">Avg Placement Score</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <h6 class="fw-bold mb-3">Placement Distribution</h6>
+          <canvas id="placementPieChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <h6 class="fw-bold mb-3">ATS Score Distribution</h6>
+          <canvas id="atsBarChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <h6 class="fw-bold mb-3">Branch-wise Students</h6>
+          <canvas id="branchChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ML Models Live Monitor -->
+<div class="card mb-4">
+  <div class="card-body p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h5 class="fw-bold mb-0">
+        <i class="bi bi-cpu me-2 text-success"></i>
+        ML Models Live Monitor
+      </h5>
+      <span class="badge px-3 py-2"
+            style="background:#dcfce7;color:#15803d;">
+        <span class="online-dot me-1"></span>Active
+      </span>
+    </div>
+
+    <div class="row g-3 mb-4">
+
+      <!-- Random Forest -->
+      <div class="col-md-4">
+        <div class="p-4 rounded-3"
+             style="background:#f0fdf4;border:2px solid #bbf7d0;">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="d-flex align-items-center justify-content-center rounded-2"
+                 style="width:46px;height:46px;
+                        background:#16a34a;color:#fff;font-size:1.3rem;">
+              🌲
+            </div>
+            <div>
+              <div class="fw-bold">Random Forest</div>
+              <div class="text-muted small">Ensemble Tree Model</div>
+            </div>
+            <span class="badge ms-auto"
+                  style="background:#dcfce7;color:#15803d;">
+              Active ✅
+            </span>
+          </div>
+          <div class="row g-2 text-center">
+            <div class="col-4">
+              <div class="p-2 rounded-2"
+                   style="background:#ffffff;border:1px solid #bbf7d0;">
+                <div class="fw-bold" style="color:#16a34a;font-size:1.1rem;">
+                  82.4%
+                </div>
+                <div class="text-muted" style="font-size:0.65rem;">Accuracy</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 rounded-2"
+                   style="background:#ffffff;border:1px solid #bbf7d0;">
+                <div class="fw-bold" style="color:#16a34a;font-size:1.1rem;">
+                  0.906
+                </div>
+                <div class="text-muted" style="font-size:0.65rem;">AUC-ROC</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 rounded-2"
+                   style="background:#ffffff;border:1px solid #bbf7d0;">
+                <div class="fw-bold" style="color:#16a34a;font-size:1.1rem;">
+                  0.839
+                </div>
+                <div class="text-muted" style="font-size:0.65rem;">F1-Score</div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="small text-muted">Performance</span>
+              <span class="small fw-bold" style="color:#16a34a;">82.4%</span>
+            </div>
+            <div class="progress" style="height:8px;">
+              <div class="progress-bar"
+                   style="width:82.4%;
+                          background:linear-gradient(90deg,#16a34a,#22c55e)">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- XGBoost -->
+      <div class="col-md-4">
+        <div class="p-4 rounded-3"
+             style="background:#eff6ff;border:2px solid #bfdbfe;">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="d-flex align-items-center justify-content-center rounded-2"
+                 style="width:46px;height:46px;
+                        background:#2563eb;color:#fff;font-size:1.3rem;">
+              ⚡
+            </div>
+            <div>
+              <div class="fw-bold">XGBoost</div>
+              <div class="text-muted small">Gradient Boosting</div>
+            </div>
+            <span class="badge ms-auto"
+                  style="background:#dbeafe;color:#1d4ed8;">
+              Active ✅
+            </span>
+          </div>
+          <div class="row g-2 text-center">
+            <div class="col-4">
+              <div class="p-2 rounded-2"
+                   style="background:#ffffff;border:1px solid #bfdbfe;">
+                <div class="fw-bold" style="color:#2563eb;font-size:1.1rem;">
+                  82.7%
+                </div>
+                <div class="text-muted" style="font-size:0.65rem;">Accuracy</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 rounded-2"
+                   style="background:#ffffff;border:1px solid #bfdbfe;">
+                <div class="fw-bold" style="color:#2563eb;font-size:1.1rem;">
+                  0.910
+                </div>
+                <div class="text-muted" style="font-size:0.65rem;">AUC-ROC</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 rounded-2"
+                   style="background:#ffffff;border:1px solid #bfdbfe;">
+                <div class="fw-bold" style="color:#2563eb;font-size:1.1rem;">
+                  0.841
+                </div>
+                <div class="text-muted" style="font-size:0.65rem;">F1-Score</div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="small text-muted">Performance</span>
+              <span class="small fw-bold" style="color:#2563eb;">82.7%</span>
+            </div>
+            <div class="progress" style="height:8px;">
+              <div class="progress-bar"
+                   style="width:82.7%;
+                          background:linear-gradient(90deg,#2563eb,#60a5fa)">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANN -->
+      <div class="col-md-4">
+        <div class="p-4 rounded-3"
+             style="background:#fdf4ff;border:2px solid #e9d5ff;">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="d-flex align-items-center justify-content-center rounded-2"
+                 style="width:46px;height:46px;
+                        background:#7c3aed;color:#fff;font-size:1.3rem;">
+              🧠
+            </div>
+            <div>
+              <div class="fw-bold">Neural Network</div>
+              <div class="text-muted small">Deep Learning ANN</div>
+            </div>
+            <span class="badge ms-auto"
+                  style="background:#ede9fe;color:#6d28d9;">
+              Active ✅
+            </span>
+          </div>
+          <div class="row g-2 text-center">
+            <div class="col-4">
+              <div class="p-2 rounded-2"
+                   style="background:#ffffff;border:1px solid #e9d5ff;">
+                <div class="fw-bold" style="color:#7c3aed;font-size:1.1rem;">
+                  83.0%
+                </div>
+                <div class="text-muted" style="font-size:0.65rem;">Accuracy</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 rounded-2"
+                   style="background:#ffffff;border:1px solid #e9d5ff;">
+                <div class="fw-bold" style="color:#7c3aed;font-size:1.1rem;">
+                  0.907
+                </div>
+                <div class="text-muted" style="font-size:0.65rem;">AUC-ROC</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 rounded-2"
+                   style="background:#ffffff;border:1px solid #e9d5ff;">
+                <div class="fw-bold" style="color:#7c3aed;font-size:1.1rem;">
+                  0.842
+                </div>
+                <div class="text-muted" style="font-size:0.65rem;">F1-Score</div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="small text-muted">Performance</span>
+              <span class="small fw-bold" style="color:#7c3aed;">83.0%</span>
+            </div>
+            <div class="progress" style="height:8px;">
+              <div class="progress-bar"
+                   style="width:83%;
+                          background:linear-gradient(90deg,#7c3aed,#a78bfa)">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Ensemble Result -->
+    <div class="p-4 rounded-3"
+         style="background:linear-gradient(135deg,#f0fdf4,#eff6ff);
+                border:2px solid #b0d4f1;">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-center rounded-2"
+                 style="width:52px;height:52px;
+                        background:linear-gradient(135deg,#16a34a,#2563eb);
+                        color:#fff;font-size:1.5rem;">
+              🔀
+            </div>
+            <div>
+              <div class="fw-bold fs-5">Weighted Ensemble</div>
+              <div class="text-muted small">
+                RF (33.3%) + XGBoost (33.4%) + ANN (33.3%)
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="row g-3 text-center">
+            <div class="col-3">
+              <div class="fw-bold fs-4 gradient-text">83.1%</div>
+              <div class="text-muted small">Accuracy</div>
+            </div>
+            <div class="col-3">
+              <div class="fw-bold fs-4 gradient-text">0.912</div>
+              <div class="text-muted small">AUC-ROC</div>
+            </div>
+            <div class="col-3">
+              <div class="fw-bold fs-4 gradient-text">0.845</div>
+              <div class="text-muted small">F1-Score</div>
+            </div>
+            <div class="col-3">
+              <div class="fw-bold fs-4 gradient-text">5000</div>
+              <div class="text-muted small">Training Samples</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature Importance -->
+    <div class="mt-4">
+      <h6 class="fw-bold mb-3">
+        <i class="bi bi-bar-chart-steps me-2 text-success"></i>
+        Top Feature Importance
+      </h6>
+      <div class="row g-2">
+        {% set features = [
+          ('Backlogs',        20.4, '#dc2626'),
+          ('Experience Score',15.2, '#ea580c'),
+          ('Skill Score',     10.8, '#7c3aed'),
+          ('Academic Score',   7.7, '#2563eb'),
+          ('CGPA',             6.8, '#16a34a'),
+          ('Internships',      5.8, '#0891b2'),
+          ('Technical Score',  4.5, '#d97706'),
+          ('Aptitude Score',   4.1, '#6d28d9'),
+        ] %}
+        {% for name, pct, color in features %}
+        <div class="col-md-6">
+          <div class="d-flex align-items-center gap-2">
+            <span class="small text-muted" style="width:130px;flex-shrink:0;">
+              {{ name }}
+            </span>
+            <div class="progress flex-grow-1" style="height:10px;">
+              <div class="progress-bar rounded-pill"
+                   style="width:{{ pct * 5 }}%;background:{{ color }};">
+              </div>
+            </div>
+            <span class="small fw-bold" style="color:{{ color }};width:40px;">
+              {{ pct }}%
+            </span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  <!-- Students Table -->
+  <div class="card">
+    <div class="card-body p-4">
+
+      <!-- Header + Filters -->
+      <div class="d-flex flex-wrap justify-content-between
+                  align-items-center gap-3 mb-3">
+        <h5 class="fw-bold mb-0">
+          <i class="bi bi-table me-2 text-success"></i>Student Records
+        </h5>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+
+          <!-- Search -->
+          <div class="input-group" style="max-width:200px;">
+            <span class="input-group-text bg-white">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text" id="searchInput"
+                   class="form-control" placeholder="Search...">
+          </div>
+
+          <!-- Branch Filter -->
+          <select id="branchFilter" class="form-select"
+                  style="max-width:160px;">
+            <option value="">All Branches</option>
+            <option value="CSE">CSE</option>
+            <option value="CSE-AI">CSE-AI</option>
+            <option value="CSE-DS">CSE-DS</option>
+            <option value="ECE">ECE</option>
+            <option value="EEE">EEE</option>
+            <option value="Civil">Civil</option>
+            <option value="Civil-CA">Civil-CA</option>
+            <option value="ME">ME (Mechanical)</option>
+            <option value="IT">IT</option>
+          </select>
+
+          <!-- Batch Filter -->
+          <select id="batchFilter" class="form-select"
+                  style="max-width:140px;">
+            <option value="">All Batches</option>
+            <option value="2022-26">2022-26</option>
+            <option value="2023-27">2023-27</option>
+            <option value="2024-28">2024-28</option>
+            <option value="2025-29">2025-29</option>
+            <option value="2026-30">2026-30</option>
+            <option value="2027-31">2027-31</option>
+          </select>
+
+          <!-- Reset -->
+          <button onclick="resetFilters()"
+                  class="btn btn-outline-light btn-sm">
+            <i class="bi bi-x-circle me-1"></i>Reset
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Count -->
+      <p class="text-muted small mb-3">
+        Showing
+        <span id="visibleCount" class="fw-bold"
+              style="color:#16a34a;">{{ users|length }}</span>
+        of {{ users|length }} students
+      </p>
+
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0"
+               id="studentsTable">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Branch</th>
+              <th>Batch</th>
+              <th>Registered</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr data-branch="{{ user.branch or '' }}"
+                data-batch="{{ user.batch or '' }}">
+              <td class="text-muted small">{{ loop.index }}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="d-flex align-items-center
+                              justify-content-center rounded-circle"
+                       style="width:34px;height:34px;
+                              background:linear-gradient(135deg,#16a34a,#22c55e);
+                              color:#fff;font-weight:700;
+                              font-size:0.85rem;flex-shrink:0;">
+                    {{ user.name[0].upper() }}
+                  </div>
+                  <span class="fw-semibold small">{{ user.name }}</span>
+                </div>
+              </td>
+              <td class="small text-muted">{{ user.email }}</td>
+              <td>
+                <span class="badge px-2 py-1"
+                      style="background:#e0f2fe;color:#0369a1;
+                             border:1px solid #b0d4f1;font-size:0.75rem;">
+                  {{ user.branch or '—' }}
+                </span>
+              </td>
+              <td class="small fw-semibold">{{ user.batch or '—' }}</td>
+              <td class="small text-muted">
+                {{ user.created_at.strftime('%d %b %Y')
+                   if user.created_at else '—' }}
+              </td>
+              <td>
+                <div class="d-flex gap-1">
+                  <a href="{{ url_for('admin.user_detail', user_id=user.id) }}"
+                     class="btn btn-sm btn-outline-light">
+                    <i class="bi bi-eye me-1"></i>View
+                  </a>
+                  <form method="POST"
+                        action="{{ url_for('admin.delete_user', user_id=user.id) }}"
+                        onsubmit="return confirm('Are you sure you want to remove {{ user.name }}? This action cannot be undone!')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No Results -->
+      <div id="noResults" class="text-center py-4 d-none">
+        <i class="bi bi-search fs-2 text-muted mb-2"></i>
+        <p class="text-muted mb-0">
+          No students found for selected filters
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function applyFilters() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const branch = document.getElementById('branchFilter').value.toLowerCase();
+  const batch  = document.getElementById('batchFilter').value.toLowerCase();
+  const rows   = document.querySelectorAll('#studentsTable tbody tr');
+  let visible  = 0;
+
+  rows.forEach(row => {
+    const matchSearch = !search || row.textContent.toLowerCase().includes(search);
+    const matchBranch = !branch || 
+                    row.dataset.branch.toLowerCase() === branch.toLowerCase();
+    const matchBatch = !batch ||
+                   row.dataset.batch.toLowerCase() === batch ||
+                   row.dataset.batch.toLowerCase().replace('-', '').startsWith(batch.split('-')[0]);
+
+    if (matchSearch && matchBranch && matchBatch) {
+      row.style.display = '';
+      visible++;
+    } else {
+      row.style.display = 'none';
+    }
+  });
+
+  document.getElementById('visibleCount').textContent = visible;
+  document.getElementById('noResults').classList.toggle('d-none', visible > 0);
+}
+
+function resetFilters() {
+  document.getElementById('searchInput').value  = '';
+  document.getElementById('branchFilter').value = '';
+  document.getElementById('batchFilter').value  = '';
+  applyFilters();
+}
+
+document.getElementById('searchInput').addEventListener('input',   applyFilters);
+document.getElementById('branchFilter').addEventListener('change', applyFilters);
+document.getElementById('batchFilter').addEventListener('change',  applyFilters);
+
+fetch('/admin/analytics-data')
+  .then(r => r.json())
+  .then(data => {
+    new Chart(document.getElementById('placementPieChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['High (≥75%)', 'Average (50-74%)', 'Needs Work (<50%)'],
+        datasets: [{
+          data: [
+            data.placement_distribution.placed,
+            data.placement_distribution.average,
+            data.placement_distribution.needs_work
+          ],
+          backgroundColor: ['#16a34a', '#f59e0b', '#ef4444'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#374151', boxWidth: 12, font: { size: 11 } }
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('atsBarChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(data.ats_distribution),
+        datasets: [{
+          data: Object.values(data.ats_distribution),
+          backgroundColor: '#0369a1', borderRadius: 6
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { ticks: { color: '#6b7280' }, grid: { color: '#e5e7eb' } },
+          x: { ticks: { color: '#6b7280' }, grid: { display: false } }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('branchChart'), {
+      type: 'pie',
+      data: {
+        labels: Object.keys(data.branch_distribution),
+        datasets: [{
+          data: Object.values(data.branch_distribution),
+          backgroundColor: [
+            '#16a34a','#0369a1','#f59e0b',
+            '#dc2626','#7c3aed','#0891b2',
+            '#ea580c','#059669','#d97706'
+          ],
+          borderWidth: 2, borderColor: '#fff'
+        }]
+      },
+      options: {
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#374151', boxWidth: 12, font: { size: 11 } }
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

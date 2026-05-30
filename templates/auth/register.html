@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}Register — PlacePredict AI{% endblock %}
+
+{% block extra_css %}
+<style>
+  #mainNav { display: none !important; }
+  .site-footer { display: none !important; }
+  main { padding: 0 !important; }
+
+  body {
+    background: linear-gradient(135deg, #e0f2fe, #f0fdf4) !important;
+    min-height: 100vh;
+  }
+
+  .auth-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+
+  .auth-card {
+    background: #ffffff;
+    border: 1px solid #c7dff0;
+    border-radius: 20px;
+    padding: 40px 36px;
+    box-shadow: 0 8px 32px rgba(14,120,190,0.15);
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .auth-card .brand-icon {
+    width: 60px; height: 60px;
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; margin: 0 auto 12px;
+  }
+
+  .auth-card .form-control,
+  .auth-card .form-select {
+    background: #f0f7ff !important;
+    border: 1.5px solid #b0cfe8 !important;
+    color: #1a1a2e !important;
+  }
+
+  .auth-card .form-control:focus,
+  .auth-card .form-select:focus {
+    border-color: #16a34a !important;
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.1) !important;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card text-center">
+
+    <!-- Logo -->
+    <div class="brand-icon">
+      <i class="bi bi-mortarboard-fill"></i>
+    </div>
+    <h4 class="fw-bold mb-1">
+      Join <span class="gradient-text">PlacePredict AI</span>
+    </h4>
+    <p class="text-muted small mb-4">
+      AI-Placement Prediction and Skill Gap Analysis
+    </p>
+
+    <form method="POST" class="text-start">
+      <div class="row g-3">
+
+        <div class="col-12">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="name" class="form-control"
+                 placeholder="Rahul Kumar" required>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Email Address</label>
+          <input type="email" name="email" class="form-control"
+                 placeholder="yourname@gmail.com" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Branch</label>
+          <select name="branch" class="form-select" required>
+            <option value="">Select Branch</option>
+            <option value="CSE">CSE</option>
+            <option value="CSE-AI">CSE-AI</option>
+            <option value="CSE-DS">CSE-DS</option>
+            <option value="ECE">ECE</option>
+            <option value="EE">EE</option>
+            <option value="ME">ME</option>
+            <option value="CE">CE</option>
+            <option value="IT">IT</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Batch Year</label>
+          <select name="batch" class="form-select">
+            <option value="2022-26">2022-26</option>
+<option value="2023-27">2023-27</option>
+<option value="2024-28">2024-28</option>
+<option value="2025-29">2025-29</option>
+<option value="2026-30">2026-30</option>
+<option value="2027-31">2027-31</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" class="form-control"
+                 placeholder="10-digit mobile number">
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control"
+                 placeholder="Min 8 characters" required>
+        </div>
+
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary w-100 py-2 fs-6">
+            <i class="bi bi-person-plus me-2"></i>Create Account
+          </button>
+        </div>
+
+      </div>
+    </form>
+
+    <p class="text-center mt-3 mb-0 small">
+      Already registered?
+      <a href="{{ url_for('auth.login') }}"
+         style="color:#16a34a;font-weight:600;">Login here</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

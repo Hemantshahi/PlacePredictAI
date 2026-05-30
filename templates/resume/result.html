@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+{% block title %}ATS Score Result — PlacePredict AI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">
+        ATS Resume <span class="gradient-text">Analysis Report</span>
+      </h2>
+      <p class="text-muted small mb-0">
+        Detailed breakdown of your resume against ATS standards
+      </p>
+    </div>
+    <a href="{{ url_for('main.dashboard') }}"
+       class="btn btn-outline-light btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Dashboard
+    </a>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- ATS Score Circle -->
+    <div class="col-lg-4">
+      <div class="card text-center h-100">
+        <div class="card-body py-4">
+          <p class="text-muted small text-uppercase fw-semibold mb-3">
+            Overall ATS Score
+          </p>
+
+          <!-- Circle -->
+          <div style="position:relative;display:inline-block;">
+            <svg viewBox="0 0 200 200" width="170" height="170">
+              <circle cx="100" cy="100" r="80" fill="none"
+                      stroke="#dbeafe" stroke-width="14"/>
+              {% if ats_result %}
+              <circle cx="100" cy="100" r="80" fill="none"
+                stroke="{% if ats_result.score >= 80 %}#16a34a{% elif ats_result.score >= 60 %}#2563eb{% elif ats_result.score >= 40 %}#f59e0b{% else %}#ef4444{% endif %}"
+                stroke-width="14"
+                stroke-dasharray="{{ (ats_result.score / 100 * 502.4)|round(1) }} 502.4"
+                stroke-dashoffset="125.6"
+                stroke-linecap="round"
+                transform="rotate(-90 100 100)"/>
+              {% endif %}
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;
+                        transform:translate(-50%,-50%);text-align:center;">
+              <div style="font-size:2.2rem;font-weight:800;color:#1a1a2e;">
+                {{ ats_result.score if ats_result else 0 }}
+              </div>
+              <div class="text-muted" style="font-size:0.75rem;">out of 100</div>
+            </div>
+          </div>
+
+          {% if ats_result %}
+          <div class="mt-3 mb-2">
+            {% if ats_result.score >= 80 %}
+              <span class="badge px-4 py-2 fs-6"
+                    style="background:#dcfce7;color:#15803d;">
+                Excellent ✨
+              </span>
+            {% elif ats_result.score >= 60 %}
+              <span class="badge px-4 py-2 fs-6"
+                    style="background:#dbeafe;color:#1d4ed8;">
+                Good 👍
+              </span>
+            {% elif ats_result.score >= 40 %}
+              <span class="badge px-4 py-2 fs-6"
+                    style="background:#fef9c3;color:#854d0e;">
+                Average ⚠️
+              </span>
+            {% else %}
+              <span class="badge px-4 py-2 fs-6"
+                    style="background:#fee2e2;color:#dc2626;">
+                Needs Work 🔧
+              </span>
+            {% endif %}
+          </div>
+          <p class="text-muted small px-2">
+            {% if ats_result.score >= 80 %}
+              Your resume is well-optimized for ATS systems!
+            {% elif ats_result.score >= 60 %}
+              Good resume. A few improvements can push you to the top tier.
+            {% elif ats_result.score >= 40 %}
+              Average score. Follow the suggestions below to improve.
+            {% else %}
+              Your resume needs significant improvement to pass ATS filters.
+            {% endif %}
+          </p>
+          {% endif %}
+
+          <div class="d-grid mt-3 px-2 gap-2">
+            <a href="{{ url_for('predict.run') }}"
+               class="btn btn-primary btn-sm">
+              <i class="bi bi-bar-chart me-1"></i>Run Placement Prediction
+            </a>
+            <a href="{{ url_for('resume.upload') }}"
+               class="btn btn-outline-light btn-sm">
+              <i class="bi bi-arrow-repeat me-1"></i>Re-upload Resume
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score Breakdown -->
+    <div class="col-lg-8">
+      {% if ats_result %}
+      <div class="card mb-4">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-4">
+            <i class="bi bi-bar-chart me-2 text-success"></i>
+            Score Breakdown
+          </h5>
+          <div class="row g-3">
+
+            <!-- Keywords -->
+            <div class="col-sm-6">
+              <div class="p-3 rounded-3"
+                   style="background:#f0f7ff;border:1px solid #b0d4f1;">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="small fw-semibold">🔑 Keyword Match</span>
+                  <span class="badge"
+                        style="background:#dbeafe;color:#1d4ed8;">
+                    {{ ats_result.breakdown.keywords }}/40
+                  </span>
+                </div>
+                <div class="progress mb-2">
+                  <div class="progress-bar"
+                       style="width:{{ (ats_result.breakdown.keywords/40*100)|round }}%;
+                              background:linear-gradient(90deg,#2563eb,#60a5fa)">
+                  </div>
+                </div>
+                <p class="text-muted small mb-0">
+                  Job-relevant keywords in resume
+                </p>
+              </div>
+            </div>
+
+            <!-- Sections -->
+            <div class="col-sm-6">
+              <div class="p-3 rounded-3"
+                   style="background:#f0fdf4;border:1px solid #bbf7d0;">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="small fw-semibold">📋 Section Score</span>
+                  <span class="badge"
+                        style="background:#dcfce7;color:#15803d;">
+                    {{ ats_result.breakdown.sections }}/30
+                  </span>
+                </div>
+                <div class="progress mb-2">
+                  <div class="progress-bar"
+                       style="width:{{ (ats_result.breakdown.sections/30*100)|round }}%;
+                              background:linear-gradient(90deg,#16a34a,#22c55e)">
+                  </div>
+                </div>
+                <p class="text-muted small mb-0">
+                  Skills, Projects, Education sections
+                </p>
+              </div>
+            </div>
+
+            <!-- Format -->
+            <div class="col-sm-6">
+              <div class="p-3 rounded-3"
+                   style="background:#fffbeb;border:1px solid #fde68a;">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="small fw-semibold">📐 Format Score</span>
+                  <span class="badge"
+                        style="background:#fef9c3;color:#854d0e;">
+                    {{ ats_result.breakdown.format }}/20
+                  </span>
+                </div>
+                <div class="progress mb-2">
+                  <div class="progress-bar"
+                       style="width:{{ (ats_result.breakdown.format/20*100)|round }}%;
+                              background:linear-gradient(90deg,#f59e0b,#fbbf24)">
+                  </div>
+                </div>
+                <p class="text-muted small mb-0">
+                  Formatting, structure, readability
+                </p>
+              </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="col-sm-6">
+              <div class="p-3 rounded-3"
+                   style="background:#fdf4ff;border:1px solid #e9d5ff;">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="small fw-semibold">📞 Contact Info</span>
+                  <span class="badge"
+                        style="background:#ede9fe;color:#6d28d9;">
+                    {{ ats_result.breakdown.contact }}/10
+                  </span>
+                </div>
+                <div class="progress mb-2">
+                  <div class="progress-bar"
+                       style="width:{{ (ats_result.breakdown.contact/10*100)|round }}%;
+                              background:linear-gradient(90deg,#7c3aed,#a78bfa)">
+                  </div>
+                </div>
+                <p class="text-muted small mb-0">
+                  Email, phone, LinkedIn, GitHub
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Keywords Found -->
+      {% if ats_result.matched_keywords %}
+      <div class="card">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3">
+            <i class="bi bi-check-circle me-2 text-success"></i>
+            Keywords Found in Resume
+          </h5>
+          <div class="d-flex flex-wrap gap-2">
+            {% for kw in ats_result.matched_keywords %}
+            <span class="badge px-3 py-2"
+                  style="background:#dcfce7;color:#15803d;
+                         border:1px solid #bbf7d0;font-size:0.78rem;">
+              ✓ {{ kw }}
+            </span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Suggestions -->
+  {% if ats_result and ats_result.suggestions %}
+  <div class="card mt-4">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-4">
+        <i class="bi bi-lightbulb me-2"
+           style="color:#f59e0b;"></i>
+        Suggestions to Improve Your ATS Score
+      </h5>
+      <div class="row g-3">
+        {% for suggestion in ats_result.suggestions %}
+        <div class="col-md-6">
+          <div class="d-flex align-items-start gap-3 p-3 rounded-3"
+               style="background:#f0f7ff;border:1px solid #c7dff0;">
+            <span class="badge rounded-circle px-2 py-1 flex-shrink-0"
+                  style="background:#16a34a;color:#fff;
+                         font-size:0.78rem;">
+              {{ loop.index }}
+            </span>
+            <p class="mb-0 small" style="color:#374151;">
+              {{ suggestion }}
+            </p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Extracted Profile -->
+  {% if parsed_data %}
+  <div class="row g-4 mt-2">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-3">
+            <i class="bi bi-person-circle me-2 text-success"></i>
+            Extracted Profile Info
+          </h6>
+          <table class="table table-sm table-borderless mb-0">
+            <tbody>
+              {% if parsed_data.name %}
+              <tr>
+                <td class="text-muted small">Name</td>
+                <td class="fw-semibold small">{{ parsed_data.name }}</td>
+              </tr>
+              {% endif %}
+              {% if parsed_data.email %}
+              <tr>
+                <td class="text-muted small">Email</td>
+                <td class="small">{{ parsed_data.email }}</td>
+              </tr>
+              {% endif %}
+              {% if parsed_data.phone %}
+              <tr>
+                <td class="text-muted small">Phone</td>
+                <td class="small">{{ parsed_data.phone }}</td>
+              </tr>
+              {% endif %}
+              {% if parsed_data.cgpa %}
+              <tr>
+                <td class="text-muted small">CGPA</td>
+                <td class="fw-semibold small">{{ parsed_data.cgpa }}</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-3">
+            <i class="bi bi-code-slash me-2 text-success"></i>
+            Skills Extracted
+          </h6>
+          {% if parsed_data.skills %}
+          <div class="d-flex flex-wrap gap-2">
+            {% for skill in parsed_data.skills[:20] %}
+            <span class="badge px-2 py-1"
+                  style="background:#e0f2fe;color:#0369a1;
+                         border:1px solid #b0d4f1;
+                         font-size:0.75rem;">
+              {{ skill }}
+            </span>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-muted small">
+            No skills extracted. Add a dedicated "Skills" section.
+          </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- CTA -->
+  <div class="card mt-4 text-center py-3"
+       style="background:linear-gradient(135deg,#f0fdf4,#dbeafe);
+              border:1px solid #b0d4f1 !important;">
+    <div class="card-body">
+      <h4 class="fw-bold mb-2 gradient-text">Ready for the Next Step?</h4>
+      <p class="text-muted mb-4">
+        Run our ML model to predict your placement probability!
+      </p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{{ url_for('predict.run') }}"
+           class="btn btn-primary px-4">
+          <i class="bi bi-rocket me-2"></i>Predict Placement
+        </a>
+        <a href="{{ url_for('main.dashboard') }}"
+           class="btn btn-outline-light px-4">
+          <i class="bi bi-grid me-2"></i>Go to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

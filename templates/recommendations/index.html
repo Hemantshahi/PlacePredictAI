@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+{% block title %}Learning Recommendations — PlacePredict AI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">
+        Personalized <span class="gradient-text">Learning Roadmap</span>
+      </h2>
+      <p class="text-muted small mb-0">
+        Curated YouTube resources based on your skill gaps
+      </p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('predict.run') }}"
+         class="btn btn-outline-light btn-sm">
+        <i class="bi bi-arrow-repeat me-1"></i>Refresh
+      </a>
+      <a href="{{ url_for('main.dashboard') }}"
+         class="btn btn-primary btn-sm">
+        <i class="bi bi-grid me-1"></i>Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- High Priority -->
+  {% if high_priority %}
+  <div class="mb-4">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <span class="badge px-3 py-2"
+            style="background:#fee2e2;color:#dc2626;
+                   border:1px solid #fecaca;font-size:0.8rem;">
+        🔴 HIGH PRIORITY — Focus First
+      </span>
+      <div style="height:2px;flex:1;background:#fecaca;"></div>
+    </div>
+    <div class="row g-4">
+      {% for rec in high_priority %}
+      <div class="col-md-6">
+        <div class="card h-100"
+             style="border-left:4px solid #dc2626 !important;">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold mb-0">{{ rec.skill }}</h5>
+              <span class="badge"
+                    style="background:#fee2e2;color:#dc2626;">HIGH</span>
+            </div>
+            <p class="text-muted small mb-3">
+              <i class="bi bi-clock me-1"></i>{{ rec.resource.time }} to master
+            </p>
+
+            <!-- YouTube Videos -->
+            <p class="fw-semibold small text-muted mb-2">
+              📺 Best YouTube Resources
+            </p>
+            {% for video in rec.resource.youtube %}
+            <a href="{{ video.url }}" target="_blank"
+               class="d-flex align-items-center gap-2 p-2 rounded-3 mb-2
+                      text-decoration-none"
+               style="background:#f0f7ff;border:1px solid #c7dff0;
+                      transition:all 0.2s;"
+               onmouseover="this.style.background='#dcfce7'"
+               onmouseout="this.style.background='#f0f7ff'">
+              <div style="width:32px;height:32px;background:#fee2e2;
+                          border-radius:8px;display:flex;align-items:center;
+                          justify-content:center;flex-shrink:0;">
+                <i class="bi bi-youtube" style="color:#dc2626;"></i>
+              </div>
+              <div class="flex-grow-1 overflow-hidden">
+                <p class="mb-0 fw-semibold small"
+                   style="color:#1a1a2e;white-space:nowrap;
+                          overflow:hidden;text-overflow:ellipsis;">
+                  {{ video.title }}
+                </p>
+                <p class="mb-0 text-muted" style="font-size:0.7rem;">
+                  {{ video.channel }} • {{ video.duration }}
+                </p>
+              </div>
+              <i class="bi bi-box-arrow-up-right text-muted"
+                 style="font-size:0.75rem;flex-shrink:0;"></i>
+            </a>
+            {% endfor %}
+
+            <!-- Roadmap Steps -->
+            <p class="fw-semibold small text-muted mt-3 mb-2">
+              🗺️ Learning Path
+            </p>
+            <div class="d-flex flex-wrap gap-1">
+              {% for step in rec.resource.roadmap %}
+              <span class="badge px-2 py-1"
+                    style="background:#e0f2fe;color:#0369a1;
+                           border:1px solid #b0d4f1;font-size:0.7rem;">
+                {{ loop.index }}. {{ step }}
+              </span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Medium Priority -->
+  {% if medium_priority %}
+  <div class="mb-4">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <span class="badge px-3 py-2"
+            style="background:#fef9c3;color:#854d0e;
+                   border:1px solid #fde68a;font-size:0.8rem;">
+        🟡 MEDIUM PRIORITY — Build These Next
+      </span>
+      <div style="height:2px;flex:1;background:#fde68a;"></div>
+    </div>
+    <div class="row g-4">
+      {% for rec in medium_priority %}
+      <div class="col-md-6">
+        <div class="card h-100"
+             style="border-left:4px solid #f59e0b !important;">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold mb-0">{{ rec.skill }}</h5>
+              <span class="badge"
+                    style="background:#fef9c3;color:#854d0e;">MEDIUM</span>
+            </div>
+            <p class="text-muted small mb-3">
+              <i class="bi bi-clock me-1"></i>{{ rec.resource.time }}
+            </p>
+            {% for video in rec.resource.youtube[:2] %}
+            <a href="{{ video.url }}" target="_blank"
+               class="d-flex align-items-center gap-2 p-2 rounded-3 mb-2
+                      text-decoration-none"
+               style="background:#f0f7ff;border:1px solid #c7dff0;
+                      transition:all 0.2s;"
+               onmouseover="this.style.background='#fef9c3'"
+               onmouseout="this.style.background='#f0f7ff'">
+              <div style="width:28px;height:28px;background:#fee2e2;
+                          border-radius:6px;display:flex;align-items:center;
+                          justify-content:center;flex-shrink:0;">
+                <i class="bi bi-youtube" style="color:#dc2626;"></i>
+              </div>
+              <div class="flex-grow-1 overflow-hidden">
+                <p class="mb-0 fw-semibold"
+                   style="font-size:0.78rem;color:#1a1a2e;
+                          white-space:nowrap;overflow:hidden;
+                          text-overflow:ellipsis;">
+                  {{ video.title }}
+                </p>
+                <p class="mb-0 text-muted" style="font-size:0.68rem;">
+                  {{ video.channel }} • {{ video.duration }}
+                </p>
+              </div>
+              <i class="bi bi-box-arrow-up-right text-muted"
+                 style="font-size:0.7rem;flex-shrink:0;"></i>
+            </a>
+            {% endfor %}
+            <div class="d-flex flex-wrap gap-1 mt-2">
+              {% for step in rec.resource.roadmap %}
+              <span class="badge px-2 py-1"
+                    style="background:#e0f2fe;color:#0369a1;
+                           font-size:0.68rem;">
+                {{ step }}
+              </span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Low Priority -->
+  {% if low_priority %}
+  <div class="mb-4">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <span class="badge px-3 py-2"
+            style="background:#dbeafe;color:#1d4ed8;
+                   border:1px solid #bfdbfe;font-size:0.8rem;">
+        🔵 GOOD TO HAVE — Learn When Possible
+      </span>
+      <div style="height:2px;flex:1;background:#bfdbfe;"></div>
+    </div>
+    <div class="row g-4">
+      {% for rec in low_priority %}
+      <div class="col-md-6">
+        <div class="card h-100"
+             style="border-left:4px solid #2563eb !important;">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="fw-bold mb-0">{{ rec.skill }}</h5>
+              <span class="badge"
+                    style="background:#dbeafe;color:#1d4ed8;">LOW</span>
+            </div>
+            <p class="text-muted small mb-3">
+              <i class="bi bi-clock me-1"></i>{{ rec.resource.time }}
+            </p>
+            {% for video in rec.resource.youtube[:1] %}
+            <a href="{{ video.url }}" target="_blank"
+               class="d-flex align-items-center gap-2 p-2 rounded-3 mb-2
+                      text-decoration-none"
+               style="background:#f0f7ff;border:1px solid #c7dff0;">
+              <div style="width:28px;height:28px;background:#fee2e2;
+                          border-radius:6px;display:flex;align-items:center;
+                          justify-content:center;">
+                <i class="bi bi-youtube" style="color:#dc2626;"></i>
+              </div>
+              <div class="flex-grow-1 overflow-hidden">
+                <p class="mb-0 fw-semibold"
+                   style="font-size:0.78rem;color:#1a1a2e;">
+                  {{ video.title }}
+                </p>
+                <p class="mb-0 text-muted" style="font-size:0.68rem;">
+                  {{ video.channel }} • {{ video.duration }}
+                </p>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- DSA 16-Week Path -->
+  <div class="mb-4">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <span class="badge px-3 py-2"
+            style="background:#dcfce7;color:#15803d;
+                   border:1px solid #bbf7d0;font-size:0.8rem;">
+        ⚡ DSA STRUCTURED PATH — 16 Week Plan
+      </span>
+      <div style="height:2px;flex:1;background:#bbf7d0;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h5 class="fw-bold mb-1 gradient-text">
+              Striver-Inspired DSA Roadmap
+            </h5>
+            <p class="text-muted small mb-0">
+              Week-by-week plan to crack coding rounds at top companies
+            </p>
+          </div>
+          <a href="https://takeuforward.org/strivers-a2z-dsa-course/strivers-a2z-dsa-course-sheet-2/"
+             target="_blank" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-box-arrow-up-right me-1"></i>Full Sheet
+          </a>
+        </div>
+
+        <div class="row g-3">
+          {% for week in dsa_path %}
+          <div class="col-md-6 col-lg-4">
+            <div class="d-flex gap-3 p-3 rounded-3"
+                 style="background:#f0f7ff;border:1px solid #c7dff0;">
+              <div class="flex-shrink-0">
+                <div class="d-flex align-items-center justify-content-center
+                            rounded-circle"
+                     style="width:40px;height:40px;
+                            background:linear-gradient(135deg,#16a34a,#22c55e);
+                            font-size:0.7rem;font-weight:700;color:#fff;">
+                  W{{ week.week.split('-')[0] }}
+                </div>
+              </div>
+              <div>
+                <p class="fw-semibold mb-0 small" style="color:#1a1a2e;">
+                  {{ week.topic }}
+                </p>
+                <p class="text-muted mb-1" style="font-size:0.72rem;">
+                  Week {{ week.week }}
+                </p>
+                <div class="d-flex gap-2">
+                  <span class="badge"
+                        style="background:#dcfce7;color:#15803d;
+                               font-size:0.65rem;">
+                    {{ week.problems }} Problems
+                  </span>
+                  <span class="badge"
+                        style="background:#e0f2fe;color:#0369a1;
+                               font-size:0.65rem;">
+                    {{ week.platform }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Practice Platforms -->
+        <div class="row g-3 mt-3">
+          {% for name, url in [('LeetCode','https://leetcode.com'),
+                                ('GeeksForGeeks','https://www.geeksforgeeks.org'),
+                                ('InterviewBit','https://www.interviewbit.com')] %}
+          <div class="col-sm-4">
+            <a href="{{ url }}" target="_blank"
+               class="d-block p-3 rounded-3 text-decoration-none text-center"
+               style="background:#f0fdf4;border:1px solid #bbf7d0;
+                      transition:all 0.2s;"
+               onmouseover="this.style.background='#dcfce7'"
+               onmouseout="this.style.background='#f0fdf4'">
+              <div class="fw-bold" style="color:#15803d;">{{ name }}</div>
+              <div class="text-muted small">Practice Here</div>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Free Certifications -->
+  <div class="card"
+       style="background:linear-gradient(135deg,#f0fdf4,#dbeafe);
+              border:1px solid #b0d4f1 !important;">
+    <div class="card-body py-4">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <h5 class="fw-bold gradient-text mb-1">
+            🎓 Free Certification Platforms
+          </h5>
+          <p class="text-muted small mb-0">
+            Boost your resume with free certifications
+          </p>
+        </div>
+        <div class="col-lg-4 mt-3 mt-lg-0">
+          <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+            <a href="https://www.coursera.org" target="_blank"
+               class="btn btn-sm btn-outline-light">Coursera</a>
+            <a href="https://www.kaggle.com/learn" target="_blank"
+               class="btn btn-sm btn-outline-light">Kaggle</a>
+            <a href="https://grow.google/certificates/" target="_blank"
+               class="btn btn-sm btn-outline-light">Google</a>
+            <a href="https://www.hackerrank.com" target="_blank"
+               class="btn btn-sm btn-outline-light">HackerRank</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

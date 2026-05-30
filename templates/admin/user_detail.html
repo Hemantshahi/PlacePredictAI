@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}Student Profile — Admin | PlacePredict AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+  <div class="row mb-4 align-items-center">
+    <div class="col">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Admin</a></li>
+          <li class="breadcrumb-item active">Student Detail</li>
+        </ol>
+      </nav>
+      <h2 class="gradient-text fw-bold">Student Profile</h2>
+    </div>
+    <div class="col-auto">
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Profile Card -->
+    <div class="col-lg-4">
+      <div class="card text-center py-4">
+        <div class="card-body">
+          <div class="mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle"
+               style="width:80px;height:80px;background:linear-gradient(135deg,#16a34a,#22c55e);font-size:2rem;font-weight:700;color:#fff;">
+            {{ user.name[0].upper() }}
+          </div>
+          <h5 class="fw-bold mb-1">{{ user.name }}</h5>
+          <p class="text-muted small mb-1">{{ user.email }}</p>
+          <p class="text-muted small mb-3">{{ user.branch or 'N/A' }} — Batch {{ user.batch or 'N/A' }}</p>
+          <span class="badge bg-success px-3 py-2">Active Student</span>
+
+          <hr class="my-3">
+
+          <div class="text-start">
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small">Phone</span>
+              <span class="small fw-semibold">{{ user.phone or 'N/A' }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small">Joined</span>
+              <span class="small">{{ user.created_at.strftime('%d %b %Y') if user.created_at else 'N/A' }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-2">
+              <span class="text-muted small">Role</span>
+              <span class="small">{{ user.role.title() }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="card mt-4">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3">Quick Stats</h6>
+          <div class="row g-2 text-center">
+            <div class="col-6">
+              <div class="p-3 rounded-3 bg-green-soft">
+                <div class="fw-bold fs-4" style="color:#16a34a;">{{ ats_scores|length }}</div>
+                <div class="text-muted small">ATS Scans</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 rounded-3 bg-blue-soft">
+                <div class="fw-bold fs-4" style="color:#2563eb;">{{ predictions|length }}</div>
+                <div class="text-muted small">Predictions</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 rounded-3 bg-orange-soft">
+                <div class="fw-bold fs-5" style="color:#ea580c;">
+                  {% if ats_scores %}{{ ats_scores[0].total_score or '—' }}{% else %}—{% endif %}
+                </div>
+                <div class="text-muted small">Latest ATS</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 rounded-3 bg-purple-soft">
+                <div class="fw-bold fs-5" style="color:#7c3aed;">
+                  {% if predictions %}{{ predictions[0].placement_probability or '—' }}%{% else %}—{% endif %}
+                </div>
+                <div class="text-muted small">Prediction</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-lg-8">
+
+      <!-- ATS Score History -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="bi bi-file-text me-2 text-success"></i>ATS Score History</h5>
+            <span class="badge bg-success">{{ ats_scores|length }} scans</span>
+          </div>
+          {% if ats_scores %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr class="text-muted small text-uppercase">
+                  <th>Date</th>
+                  <th>Total Score</th>
+                  <th>Keywords</th>
+                  <th>Format</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for ats in ats_scores %}
+                <tr>
+                  <td class="small text-muted">{{ ats.scored_at.strftime('%d %b %Y') if ats.scored_at else 'N/A' }}</td>
+                  <td>
+                    <span class="fw-bold {% if ats.total_score >= 70 %}text-success{% elif ats.total_score >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                      {{ ats.total_score or 0 }}
+                    </span>
+                  </td>
+                  <td class="small">{{ ats.keyword_score or '—' }}</td>
+                  <td class="small">{{ ats.format_score or '—' }}</td>
+                  <td>
+                    {% if (ats.total_score or 0) >= 70 %}
+                      <span class="badge bg-success">Good</span>
+                    {% elif (ats.total_score or 0) >= 50 %}
+                      <span class="badge bg-warning text-dark">Average</span>
+                    {% else %}
+                      <span class="badge bg-danger">Low</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+            <div class="text-center py-4">
+              <i class="bi bi-file-earmark-arrow-up fs-2 text-muted mb-2"></i>
+              <p class="text-muted small mb-0">No ATS scans yet</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Prediction History -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="bi bi-graph-up me-2" style="color:#7c3aed;"></i>ML Prediction History</h5>
+            <span class="badge" style="background:#7c3aed;">{{ predictions|length }} runs</span>
+          </div>
+          {% if predictions %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr class="text-muted small text-uppercase">
+                  <th>Date</th>
+                  <th>Final Score</th>
+                  <th>RF</th>
+                  <th>XGBoost</th>
+                  <th>ANN</th>
+                  <th>Verdict</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for pred in predictions %}
+                <tr>
+                  <td class="small text-muted">{{ pred.predicted_at.strftime('%d %b %Y') if pred.predicted_at else 'N/A' }}</td>
+                  <td>
+                    <span class="fw-bold {% if (pred.placement_probability or 0) >= 70 %}text-success{% elif (pred.placement_probability or 0) >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                      {{ pred.placement_probability or 0 }}%
+                    </span>
+                  </td>
+                  <td class="small">{{ pred.rf_score or '—' }}%</td>
+                  <td class="small">{{ pred.xgb_score or '—' }}%</td>
+                  <td class="small">{{ pred.ann_score or '—' }}%</td>
+                  <td>
+                    {% if (pred.placement_probability or 0) >= 70 %}
+                      <span class="badge bg-success">Likely Placed</span>
+                    {% elif (pred.placement_probability or 0) >= 50 %}
+                      <span class="badge bg-warning text-dark">Moderate</span>
+                    {% else %}
+                      <span class="badge bg-danger">Needs Work</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+            <div class="text-center py-4">
+              <i class="bi bi-robot fs-2 text-muted mb-2"></i>
+              <p class="text-muted small mb-0">No predictions run yet</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

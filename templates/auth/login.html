@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% block title %}Login — PlacePredict AI{% endblock %}
+
+{% block extra_css %}
+<style>
+  #mainNav { display: none !important; }
+  .site-footer { display: none !important; }
+  main { padding: 0 !important; }
+
+  body {
+    background: linear-gradient(135deg, #e0f2fe, #f0fdf4) !important;
+    min-height: 100vh;
+  }
+
+  .auth-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+
+  .auth-card {
+    background: #ffffff;
+    border: 1px solid #c7dff0;
+    border-radius: 20px;
+    padding: 40px 36px;
+    box-shadow: 0 8px 32px rgba(14,120,190,0.15);
+    width: 100%;
+    max-width: 460px;
+  }
+
+  .auth-card .brand-icon {
+    width: 60px; height: 60px;
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; margin: 0 auto 12px;
+  }
+
+  /* Tab Styles */
+  .login-tabs {
+    display: flex;
+    gap: 8px;
+    background: #f0f7ff;
+    border-radius: 12px;
+    padding: 6px;
+    margin-bottom: 28px;
+  }
+
+  .login-tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: #6b7280;
+  }
+
+  .login-tab.active {
+    background: #ffffff;
+    color: #16a34a;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .login-tab.admin.active {
+    background: #ffffff;
+    color: #0369a1;
+  }
+
+  .form-panel { display: none; }
+  .form-panel.active { display: block; }
+
+  .auth-card .form-control,
+  .auth-card .input-group-text {
+    background: #f0f7ff !important;
+    border: 1.5px solid #b0cfe8 !important;
+    color: #1a1a2e !important;
+  }
+
+  .auth-card .form-control:focus {
+    border-color: #16a34a !important;
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.1) !important;
+  }
+
+  .admin-panel .form-control:focus {
+    border-color: #0369a1 !important;
+    box-shadow: 0 0 0 3px rgba(3,105,161,0.1) !important;
+  }
+
+  .btn-admin {
+    background: linear-gradient(135deg, #0369a1, #0ea5e9) !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 12px;
+    width: 100%;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .btn-admin:hover {
+    background: linear-gradient(135deg, #025f8f, #0369a1) !important;
+    transform: translateY(-1px);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="text-center mb-4">
+      <div class="brand-icon">
+        <i class="bi bi-mortarboard-fill"></i>
+      </div>
+      <h4 class="fw-bold mb-1">
+        PlacePredict <span class="gradient-text">AI</span>
+      </h4>
+      <p class="text-muted small mb-0">
+        AI-Placement Prediction and Skill Gap Analysis
+      </p>
+      <p class="text-muted small">
+        Motihari College of Engineering
+      </p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="switchTab('student')">
+        <i class="bi bi-person-badge me-2"></i>Student Login
+      </button>
+      <button class="login-tab admin" onclick="switchTab('admin')">
+        <i class="bi bi-shield-lock me-2"></i>Admin Login
+      </button>
+    </div>
+
+    <!-- Student Form -->
+    <div class="form-panel active" id="studentPanel">
+      <form method="POST" action="{{ url_for('auth.login') }}">
+        <input type="hidden" name="login_type" value="student">
+        <div class="mb-3">
+          <label class="form-label">Student Email</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-envelope"></i>
+            </span>
+            <input type="email" name="email" class="form-control"
+                   placeholder="yourname@gmail.com" required>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-lock"></i>
+            </span>
+            <input type="password" name="password" class="form-control"
+                   placeholder="Enter password" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-2 fs-6">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Login as Student
+        </button>
+      </form>
+
+      <p class="text-center mt-3 mb-0 small">
+        Don't have an account?
+        <a href="{{ url_for('auth.register') }}"
+           style="color:#16a34a;font-weight:600;">Register here</a>
+      </p>
+    </div>
+
+    <!-- Admin Form -->
+    <div class="form-panel admin-panel" id="adminPanel">
+      <div class="text-center mb-3 p-3 rounded-3"
+           style="background:#eff6ff;border:1px solid #bfdbfe;">
+        <i class="bi bi-shield-check text-primary me-2"></i>
+        <span class="small fw-semibold" style="color:#1d4ed8;">
+          T&P Cell Administrator Access
+        </span>
+      </div>
+      <form method="POST" action="{{ url_for('auth.login') }}">
+        <input type="hidden" name="login_type" value="admin">
+        <div class="mb-3">
+          <label class="form-label">Admin Email</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-person-badge"></i>
+            </span>
+            <input type="email" name="email" class="form-control"
+                   placeholder="admin@mce.ac.in" required>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Admin Password</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-key"></i>
+            </span>
+            <input type="password" name="password" class="form-control"
+                   placeholder="Enter admin password" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-admin">
+          <i class="bi bi-shield-lock me-2"></i>Login as Admin
+        </button>
+      </form>
+
+      <p class="text-center mt-3 mb-0 small text-muted">
+        Admin access is restricted to T&P Cell staff only.
+      </p>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function switchTab(type) {
+  // Tabs
+  document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+
+  if (type === 'student') {
+    document.querySelectorAll('.login-tab')[0].classList.add('active');
+    document.getElementById('studentPanel').classList.add('active');
+  } else {
+    document.querySelectorAll('.login-tab')[1].classList.add('active');
+    document.getElementById('adminPanel').classList.add('active');
+  }
+}
+</script>
+{% endblock %}

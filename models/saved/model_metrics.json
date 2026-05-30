@@ -1,0 +1,35 @@
+{
+  "random_forest": {
+    "accuracy": 0.824,
+    "auc": 0.9061,
+    "f1": 0.8391,
+    "precision": 0.8438,
+    "recall": 0.8345
+  },
+  "xgboost": {
+    "accuracy": 0.827,
+    "auc": 0.9099,
+    "f1": 0.8414,
+    "precision": 0.8484,
+    "recall": 0.8345
+  },
+  "ann": {
+    "accuracy": 0.83,
+    "auc": 0.9072,
+    "f1": 0.8423,
+    "precision": 0.8598,
+    "recall": 0.8255
+  },
+  "ensemble": {
+    "accuracy": 0.831,
+    "auc": 0.9123,
+    "f1": 0.8451,
+    "precision": 0.8521,
+    "recall": 0.8382
+  },
+  "weights": {
+    "rf": 0.3327,
+    "xgb": 0.3341,
+    "ann": 0.3331
+  }
+}

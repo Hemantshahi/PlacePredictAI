@@ -1,0 +1,475 @@
+{% extends "base.html" %}
+{% block title %}Placement Analysis — PlacePredict AI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">Your Placement <span class="gradient-text">Analysis Report</span></h2>
+      <p class="text-muted small mb-0">AI-powered prediction based on your profile</p>
+    </div>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-light btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Dashboard
+    </a>
+  </div>
+
+  <!-- Row 1: Main Score + Quick Stats -->
+  <div class="row g-4 mb-4">
+
+    <!-- Placement Probability -->
+    <div class="col-lg-4">
+      <div class="card text-center py-4 h-100">
+        <div class="card-body">
+          <p class="text-muted small fw-semibold text-uppercase mb-3">
+            Placement Probability
+          </p>
+
+          {% set prob = prediction.placement_probability or 0 %}
+          {% set color = prediction.status_color or '#16a34a' %}
+          {% set circumference = 502.65 %}
+          {% set filled = (prob / 100 * circumference) | round(2) %}
+
+          <div style="position:relative;display:inline-block;">
+            <svg viewBox="0 0 200 200" width="180" height="180">
+              <!-- Background circle -->
+              <circle cx="100" cy="100" r="80"
+                      fill="none"
+                      stroke="#dbeafe"
+                      stroke-width="16"/>
+              <!-- Progress circle -->
+              <circle cx="100" cy="100" r="80"
+                      fill="none"
+                      stroke="{{ color }}"
+                      stroke-width="16"
+                      stroke-linecap="round"
+                      stroke-dasharray="{{ filled }} {{ circumference }}"
+                      stroke-dashoffset="125.66"
+                      transform="rotate(-90 100 100)"/>
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;
+                        transform:translate(-50%,-50%);text-align:center;">
+              <div style="font-size:2.2rem;font-weight:800;color:#1a1a2e;
+                          line-height:1.1;">
+                {{ prob }}%
+              </div>
+              <div style="font-size:0.85rem;font-weight:600;color:{{ color }};">
+                {{ prediction.placement_status or 'Good' }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 mb-2">
+            {% if prob >= 75 %}
+              <span class="badge px-4 py-2 fs-6"
+                    style="background:#dcfce7;color:#15803d;">
+                🎉 High Chance!
+              </span>
+            {% elif prob >= 50 %}
+              <span class="badge px-4 py-2 fs-6"
+                    style="background:#fef9c3;color:#854d0e;">
+                👍 Moderate Chance
+              </span>
+            {% else %}
+              <span class="badge px-4 py-2 fs-6"
+                    style="background:#fee2e2;color:#dc2626;">
+                💪 Keep Improving!
+              </span>
+            {% endif %}
+          </div>
+
+          <p class="text-muted small px-3">
+            {% if prob >= 75 %}
+              Excellent profile! You have strong placement chances.
+            {% elif prob >= 50 %}
+              Good profile. Focus on skill gaps to boost your chances.
+            {% else %}
+              Work on the suggested skills to improve significantly.
+            {% endif %}
+          </p>
+
+          <div class="d-grid mt-3 px-2">
+            <a href="{{ url_for('recommend.index') }}"
+               class="btn btn-primary btn-sm">
+              <i class="bi bi-lightbulb me-1"></i>View Learning Resources
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="col-lg-8">
+      <div class="row g-3 h-100">
+
+        <!-- ATS Score -->
+        <div class="col-sm-6">
+          <div class="card h-100">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="stat-icon bg-green-soft">
+                  <i class="bi bi-file-earmark-check" style="color:#16a34a;"></i>
+                </div>
+                <div>
+                  <p class="text-muted small mb-0">Resume Score</p>
+                  <h4 class="fw-bold mb-0">{{ features.ats_score or 0 }}/100</h4>
+                </div>
+              </div>
+              <div class="progress mb-2">
+                <div class="progress-bar"
+                     style="width:{{ features.ats_score or 0 }}%"></div>
+              </div>
+              <p class="text-muted small mb-0">
+                {% if (features.ats_score or 0) >= 70 %}✅ Strong resume
+                {% elif (features.ats_score or 0) >= 50 %}⚠️ Resume needs improvement
+                {% else %}❌ Improve your resume structure{% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CGPA -->
+        <div class="col-sm-6">
+          <div class="card h-100">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="stat-icon bg-blue-soft">
+                  <i class="bi bi-mortarboard" style="color:#2563eb;"></i>
+                </div>
+                <div>
+                  <p class="text-muted small mb-0">Academic Score</p>
+                  <h4 class="fw-bold mb-0">{{ features.cgpa or 0 }}/10</h4>
+                </div>
+              </div>
+              <div class="progress mb-2">
+                <div class="progress-bar"
+                     style="width:{{ ((features.cgpa or 0)/10*100)|round }}%;
+                            background:linear-gradient(90deg,#2563eb,#60a5fa)"></div>
+              </div>
+              <p class="text-muted small mb-0">
+                {% if (features.cgpa or 0) >= 8 %}✅ Excellent CGPA
+                {% elif (features.cgpa or 0) >= 6.5 %}👍 Good CGPA
+                {% else %}💪 Focus on academics{% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience -->
+        <div class="col-sm-6">
+          <div class="card h-100">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="stat-icon bg-orange-soft">
+                  <i class="bi bi-briefcase" style="color:#ea580c;"></i>
+                </div>
+                <div>
+                  <p class="text-muted small mb-0">Experience</p>
+                  <h4 class="fw-bold mb-0">{{ features.internships or 0 }} Internships</h4>
+                </div>
+              </div>
+              <p class="text-muted small mb-1">
+                <i class="bi bi-folder me-1"></i>{{ features.projects or 0 }} Projects
+              </p>
+              <p class="text-muted small mb-0">
+                <i class="bi bi-award me-1"></i>{{ features.certifications or 0 }} Certifications
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills Score -->
+        <div class="col-sm-6">
+          <div class="card h-100">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="stat-icon bg-purple-soft">
+                  <i class="bi bi-code-slash" style="color:#7c3aed;"></i>
+                </div>
+                <div>
+                  <p class="text-muted small mb-0">Skills Score</p>
+                  <h4 class="fw-bold mb-0">{{ features.coding_skill or 0 }}/10</h4>
+                </div>
+              </div>
+              <div class="progress mb-2">
+                <div class="progress-bar"
+                     style="width:{{ ((features.coding_skill or 0)/10*100)|round }}%;
+                            background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div>
+              </div>
+              <p class="text-muted small mb-0">
+                Communication: {{ features.communication_skill or 0 }}/10
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Skill Gap + Roadmap -->
+  <div class="row g-4 mb-4">
+
+    <!-- Skill Gap -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">
+              <i class="bi bi-puzzle me-2 text-success"></i>Skill Analysis
+            </h5>
+            {% if gap %}
+            <span class="badge px-3 py-2"
+                  style="background:{{ gap.readiness_color or '#16a34a' }};color:#fff;">
+              {{ gap.readiness or 'Good' }} Readiness
+            </span>
+            {% endif %}
+          </div>
+
+          {% if gap %}
+          <div class="mb-4">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="small fw-semibold">
+                Match for <strong>{{ gap.job_role }}</strong>
+              </span>
+              <span class="fw-bold" style="color:#16a34a;">
+                {{ gap.match_percentage }}%
+              </span>
+            </div>
+            <div class="progress" style="height:12px;">
+              <div class="progress-bar"
+                   style="width:{{ gap.match_percentage }}%;
+                          background:{{ gap.readiness_color or '#16a34a' }}">
+              </div>
+            </div>
+          </div>
+
+          {% if gap.present_skills %}
+          <h6 class="fw-semibold mb-2" style="color:#16a34a;">
+            <i class="bi bi-check-circle me-1"></i>Your Strong Skills
+          </h6>
+          <div class="d-flex flex-wrap gap-1 mb-3">
+            {% for skill in gap.present_skills %}
+            <span class="badge px-2 py-1"
+                  style="background:#dcfce7;color:#15803d;
+                         border:1px solid #bbf7d0;font-size:0.75rem;">
+              ✓ {{ skill }}
+            </span>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% if gap.missing_skills %}
+          <h6 class="fw-semibold mb-2" style="color:#dc2626;">
+            <i class="bi bi-exclamation-circle me-1"></i>Skills to Learn
+          </h6>
+          <div class="d-flex flex-wrap gap-1">
+            {% for item in gap.missing_skills[:8] %}
+            <span class="badge px-2 py-1"
+                  style="background:{% if item.priority == 'critical' %}#fee2e2;color:#dc2626;border:1px solid #fecaca{% elif item.priority == 'important' %}#ffedd5;color:#ea580c;border:1px solid #fed7aa{% else %}#dbeafe;color:#2563eb;border:1px solid #bfdbfe{% endif %};font-size:0.75rem;">
+              {{ item.skill }}
+            </span>
+            {% endfor %}
+          </div>
+          <p class="text-muted mt-2" style="font-size:0.72rem;">
+            🔴 Must Learn &nbsp; 🟠 Important &nbsp; 🔵 Good to Have
+          </p>
+          {% endif %}
+          {% else %}
+          <div class="text-center py-4">
+            <i class="bi bi-graph-up fs-2 text-muted mb-2"></i>
+            <p class="text-muted small">Run prediction to see skill analysis</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Learning Roadmap -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3">
+            <i class="bi bi-map me-2 text-success"></i>Learning Roadmap
+          </h5>
+          {% if gap and gap.recommendations %}
+          <div class="d-flex flex-column gap-2">
+            {% for rec in gap.recommendations[:5] %}
+            <div class="p-3 rounded-3"
+                 style="background:#f0f7ff;border-left:4px solid
+                 {% if rec.priority == 'critical' %}#dc2626
+                 {% elif rec.priority == 'important' %}#ea580c
+                 {% else %}#2563eb{% endif %};">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-semibold small">{{ rec.skill.title() }}</span>
+                <span class="text-muted" style="font-size:0.72rem;">
+                  ⏱ {{ rec.estimated_time }}
+                </span>
+              </div>
+              {% if rec.resources %}
+              <a href="{{ rec.resources[0].url }}" target="_blank"
+                 class="small text-decoration-none" style="color:#0369a1;">
+                <i class="bi bi-play-btn me-1"></i>
+                {{ rec.resources[0].title[:45] }}...
+              </a>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <div class="d-grid mt-3">
+            <a href="{{ url_for('recommend.index') }}"
+               class="btn btn-primary btn-sm">
+              <i class="bi bi-collection-play me-1"></i>View All Resources
+            </a>
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <i class="bi bi-book fs-2 text-muted mb-2"></i>
+            <p class="text-muted small mb-3">No roadmap data yet</p>
+            <a href="{{ url_for('recommend.index') }}"
+               class="btn btn-primary btn-sm">View Learning Resources</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Company Recommendations -->
+  {% if companies %}
+  <div class="card mb-4">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-4">
+        <i class="bi bi-building me-2 text-success"></i>
+        Companies That Match Your Profile
+      </h5>
+      <div class="row g-3">
+        {% for company in companies %}
+        <div class="col-md-6 col-lg-3">
+          <div class="p-3 rounded-3 h-100"
+               style="background:#f8fbff;border:1px solid #c7dff0;
+                      transition:all 0.2s;"
+               onmouseover="this.style.boxShadow='0 4px 15px rgba(14,120,190,0.15)'"
+               onmouseout="this.style.boxShadow='none'">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="d-flex align-items-center justify-content-center rounded-2"
+                   style="width:36px;height:36px;
+                          background:linear-gradient(135deg,#16a34a,#22c55e);
+                          color:#fff;font-weight:800;font-size:1rem;flex-shrink:0;">
+                {{ company.name[0] }}
+              </div>
+              <div>
+                <div class="fw-bold small">{{ company.name }}</div>
+                <div class="text-muted" style="font-size:0.7rem;">
+                  {{ company.tier }}
+                </div>
+              </div>
+            </div>
+            <div class="mb-2">
+              <div class="d-flex justify-content-between mb-1">
+                <span style="font-size:0.72rem;" class="text-muted">Match</span>
+                <span style="font-size:0.72rem;font-weight:700;color:#16a34a;">
+                  {{ company.match_percentage }}%
+                </span>
+              </div>
+              <div class="progress" style="height:5px;">
+                <div class="progress-bar"
+                     style="width:{{ company.match_percentage }}%;
+                     background:{% if company.match_percentage >= 75 %}#16a34a
+                     {% elif company.match_percentage >= 50 %}#f59e0b
+                     {% else %}#ef4444{% endif %}">
+                </div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span style="font-size:0.72rem;color:#16a34a;font-weight:600;">
+                <i class="bi bi-cash me-1"></i>{{ company.package }}
+              </span>
+              <span style="font-size:0.7rem;" class="text-muted">
+                {{ company.domain }}
+              </span>
+            </div>
+            <div class="d-flex gap-1">
+              <a href="https://www.linkedin.com/jobs/search/?keywords={{ company.name }}"
+                 target="_blank" class="btn btn-sm w-50"
+                 style="background:#0077b5;color:#fff;
+                        font-size:0.68rem;padding:4px 2px;">
+                <i class="bi bi-linkedin me-1"></i>LinkedIn
+              </a>
+              <a href="https://www.naukri.com/{{ company.name|lower|replace(' ','-') }}-jobs"
+                 target="_blank" class="btn btn-sm w-50"
+                 style="background:#ff7555;color:#fff;
+                        font-size:0.68rem;padding:4px 2px;">
+                <i class="bi bi-briefcase me-1"></i>Naukri
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Row 4: Profile Summary -->
+  <div class="card mb-4">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-4">
+        <i class="bi bi-person-check me-2 text-success"></i>Your Profile Summary
+      </h5>
+      <div class="row g-3">
+        {% set items = [
+          ('🎓 CGPA', features.cgpa),
+          ('📚 10th %', features.tenth_percent),
+          ('📚 12th %', features.twelfth_percent),
+          ('⚠️ Backlogs', features.backlogs),
+          ('💼 Internships', features.internships),
+          ('🗂️ Projects', features.projects),
+          ('🏆 Certifications', features.certifications),
+          ('🗣️ Communication', (features.communication_skill|string) ~ '/10'),
+          ('💻 Coding', (features.coding_skill|string) ~ '/10'),
+          ('🧠 Aptitude', (features.aptitude_score|string) ~ '%'),
+          ('⚙️ Technical', (features.technical_skill_score|string) ~ '%'),
+          ('📄 ATS Score', features.ats_score),
+        ] %}
+        {% for label, val in items %}
+        <div class="col-6 col-md-4 col-lg-2">
+          <div class="text-center p-3 rounded-3"
+               style="background:#f0f7ff;border:1px solid #c7dff0;">
+            <div class="text-muted mb-1" style="font-size:0.7rem;">{{ label }}</div>
+            <div class="fw-bold" style="font-size:1.1rem;color:#1a1a2e;">
+              {{ val or '—' }}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="card text-center py-4"
+       style="background:linear-gradient(135deg,#f0fdf4,#dbeafe);
+              border:1px solid #b0d4f1 !important;">
+    <div class="card-body">
+      <h4 class="fw-bold mb-2 gradient-text">Next Steps for You</h4>
+      <p class="text-muted mb-4">
+        Follow your learning roadmap and improve your placement chances!
+      </p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{{ url_for('recommend.index') }}" class="btn btn-primary px-4">
+          <i class="bi bi-collection-play me-2"></i>Start Learning
+        </a>
+        <a href="{{ url_for('resume.upload') }}" class="btn btn-outline-light px-4">
+          <i class="bi bi-upload me-2"></i>Update Resume
+        </a>
+        <a href="{{ url_for('chatbot.chatbot_page') }}" class="btn btn-outline-light px-4">
+          <i class="bi bi-robot me-2"></i>Ask PlaceBot
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
